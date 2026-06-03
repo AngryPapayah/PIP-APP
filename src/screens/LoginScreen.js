@@ -71,7 +71,7 @@ export default function LoginScreen() {
             <Text style={styles.orText}> OR </Text>
 
             <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleRegister}>
-                <Text style={styles.buttonText}>Sign in</Text>
+                <Text style={styles.buttonText}>Sign up</Text>
             </TouchableOpacity>
 
         </View>
