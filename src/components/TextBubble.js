@@ -1,12 +1,18 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {colors} from '../styles/GlobalStyles';
+import Typewriter from './animations/TextAnimation';
 
-export default function TextBubble({text}) {
+export default function TextBubble({text, onAnimationComplete}) {
     return (
         <View style={styles.container}>
             <View style={styles.bubble}>
-                <Text style={styles.text}>{text}</Text>
+                <Typewriter 
+                    style={styles.text} 
+                    text={text} 
+                    speed={30} 
+                    onAnimationComplete={onAnimationComplete} 
+                />
             </View>
             <View style={styles.tailContainer}>
                 <View style={styles.tail} />
