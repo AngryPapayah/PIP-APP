@@ -5,6 +5,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import {colors} from '../styles/GlobalStyles';
 import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
+import {Ionicons} from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,10 +24,37 @@ export default function BottomTabNavigator() {
                 headerTintColor: colors.textCard,
             }}
         >
-            <Tab.Screen name="Hamsterverse" component={HamsterverseScreen}/>
-            <Tab.Screen name="Home" component={HomeScreen}/>
-            <Tab.Screen name="Profile" component={ProfileScreen}/>
-            {/*<Tab.Screen name="Profile" component={ProfileScreen}/>*/}
+
+            <Tab.Screen
+                name="Hamsterverse"
+                component={HamsterverseScreen}
+                options={{
+                    tabBarIcon: ({color, size}) => (
+                        <Ionicons name="planet" color={color} size={size}/>
+                    ),
+                }}
+            />
+
+            <Tab.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{
+                    tabBarIcon: ({color, size}) => (
+                        <Ionicons name="home" color={color} size={size}/>
+                    ),
+                }}
+            />
+
+            <Tab.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{
+                    tabBarIcon: ({color, size}) => (
+                        <Ionicons name="person" color={color} size={size}/>
+                    ),
+                }}
+            />
+
         </Tab.Navigator>
     );
 }
