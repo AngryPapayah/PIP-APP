@@ -15,10 +15,10 @@ export default function HamsterverseScreen() {
 
     const handleNextMessage = () => {
         if (messageIndex < conversation.length - 1) {
-            // Add a 0.7s delay before moving to the next message
+            // Add a 1s delay before moving to the next message
             setTimeout(() => {
                 setMessageIndex(messageIndex + 1);
-            }, 700);
+            }, 1000);
         }
     };
 
