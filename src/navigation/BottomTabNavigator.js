@@ -1,15 +1,15 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
-import SettingsScreen from '../screens/SettingsScreen';
 import {colors} from '../styles/GlobalStyles';
 import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
+import {Image, TouchableOpacity} from "react-native";
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigator({navigation}) {
     return (
         <Tab.Navigator
             screenOptions={{
@@ -22,6 +22,19 @@ export default function BottomTabNavigator() {
                     backgroundColor: colors.navbar,
                 },
                 headerTintColor: colors.textCard,
+                headerTitle: '',
+                headerLeft: () => (
+                    <Image
+                        source={require('../../public/images/pip-head.png')}
+                        style={{width: 40, height: 40, marginLeft: 15,}}
+                        resizeMode="contain"
+                    />
+                ),
+                headerRight: () => (
+                    <TouchableOpacity onPress={() => navigation.openDrawer()} style={{marginRight: 15}}>
+                        <Ionicons name="menu" size={30} color={colors.textCard}/>
+                    </TouchableOpacity>
+                ),
             }}
         >
 
