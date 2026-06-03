@@ -12,6 +12,7 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabNavigator({navigation}) {
     return (
         <Tab.Navigator
+            initialRouteName="Home"
             screenOptions={{
                 tabBarStyle: {
                     backgroundColor: colors.navbar,
@@ -22,7 +23,11 @@ export default function BottomTabNavigator({navigation}) {
                     backgroundColor: colors.navbar,
                 },
                 headerTintColor: colors.textCard,
-                headerTitle: '',
+                headerTitleStyle: {
+                    fontSize: 24,
+                    fontWeight: 'bold',
+                },
+                headerTitle: 'P.I.P',
                 headerLeft: () => (
                     <Image
                         source={require('../../public/images/pip-head.png')}

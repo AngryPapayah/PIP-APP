@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { globalStyles, colors } from '../styles/GlobalStyles';
+import {StyleSheet, Text, View} from 'react-native';
+import {globalStyles, colors} from '../styles/GlobalStyles';
 
 export default function HomeScreen() {
     return (
         <View style={styles.container}>
-            <Text style={globalStyles?.text || styles.text}>Home Screen</Text>
+            <Text style={globalStyles?.text || styles.text}>Challenges</Text>
         </View>
     );
 }
