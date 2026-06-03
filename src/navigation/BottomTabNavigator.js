@@ -6,6 +6,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
 import {Image, TouchableOpacity} from "react-native";
+import LoginScreen from "../screens/LoginScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -49,6 +50,16 @@ export default function BottomTabNavigator({navigation}) {
                 options={{
                     tabBarIcon: ({color, size}) => (
                         <Ionicons name="planet" color={color} size={size}/>
+                    ),
+                }}
+            />
+
+            <Tab.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{
+                    tabBarIcon: ({color, size}) => (
+                        <Ionicons name="locked" color={color} size={size}/>
                     ),
                 }}
             />
