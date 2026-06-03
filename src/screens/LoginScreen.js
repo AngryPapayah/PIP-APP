@@ -5,7 +5,8 @@ import TextBubble from "../components/TextBubble";
 
 const conversation = [
     "Welcome to P.I.P.",
-    "Your Parental Informative Program."
+    "Your Parental Informative Program.",
+    "Let's get started!"
 ];
 
 export default function LoginScreen() {
@@ -26,10 +27,9 @@ export default function LoginScreen() {
     };
 
     const handleLogin = () => {
-        // Basic login logic, for now just logging the credentials
+        // Basic login logic
         console.log('Email:', email);
         console.log('Password:', password);
-        // Here you would typically handle authentication (e.g., with Firebase, an API, etc.)
     };
 
     return (
@@ -63,6 +63,8 @@ export default function LoginScreen() {
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
+
+
         </View>
     );
 }

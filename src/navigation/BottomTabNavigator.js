@@ -55,16 +55,6 @@ export default function BottomTabNavigator({navigation}) {
             />
 
             <Tab.Screen
-                name="Login"
-                component={LoginScreen}
-                options={{
-                    tabBarIcon: ({color, size}) => (
-                        <Ionicons name="locked" color={color} size={size}/>
-                    ),
-                }}
-            />
-
-            <Tab.Screen
                 name="Home"
                 component={HomeScreen}
                 options={{
