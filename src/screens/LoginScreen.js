@@ -13,6 +13,7 @@ export default function LoginScreen({navigation}) {
     // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     // textbubble
     const [messageIndex, setMessageIndex] = useState(0);
@@ -27,15 +28,19 @@ export default function LoginScreen({navigation}) {
     };
 
     const handleLogin = () => {
-        // Basic login logic
-        console.log('Email:', email);
-        console.log('Password:', password);
-        navigation.navigate('Main');
+        if (!email || !password) {
+            setErrorMessage('Please fill in all fields.');
+            return;
+        } else {
+            setErrorMessage('');
+            navigation.navigate('Main');
+        }
+        // Hardcoded
+        console.log('Logging in with:', {email, password});
     };
 
     const handleRegister = () => {
         navigation.navigate('Signup');
-        // console.log('Register tapped');
     };
 
     return (
@@ -66,6 +71,9 @@ export default function LoginScreen({navigation}) {
                 onChangeText={setPassword}
                 secureTextEntry
             />
+
+            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
@@ -121,5 +129,10 @@ const styles = StyleSheet.create({
         color: colors?.textMain || '#000000',
         marginVertical: 10,
         fontWeight: 'bold',
-    }
+    },
+    errorText: {
+        color: colors?.error || '#FF3B3B',
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
 });
