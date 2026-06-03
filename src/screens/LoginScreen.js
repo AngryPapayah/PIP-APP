@@ -1,11 +1,29 @@
 import React, {useState} from "react";
 import {StyleSheet, Text, View, TextInput, TouchableOpacity, Image} from "react-native";
 import {globalStyles, colors} from "../styles/GlobalStyles";
-import {CustomButton} from "../components/CustomButton";
+import TextBubble from "../components/TextBubble";
+
+const conversation = [
+    "Welcome to P.I.P.",
+    "Your Parental Informative Program."
+];
 
 export default function LoginScreen() {
+    // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    // textbubble
+    const [messageIndex, setMessageIndex] = useState(0);
+
+    const handleNextMessage = () => {
+        if (messageIndex < conversation.length - 1) {
+            // Add a 1s delay before moving to the next message
+            setTimeout(() => {
+                setMessageIndex(messageIndex + 1);
+            }, 1000);
+        }
+    };
 
     const handleLogin = () => {
         // Basic login logic, for now just logging the credentials
@@ -16,6 +34,10 @@ export default function LoginScreen() {
 
     return (
         <View style={styles.container}>
+            <TextBubble
+                text={conversation[messageIndex]}
+                onAnimationComplete={handleNextMessage}
+            />
             <Image
                 source={require('../../public/images/pip-body.png')}
                 style={{width: 200, height: 200, marginLeft: 15,}}
