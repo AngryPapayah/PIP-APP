@@ -26,7 +26,7 @@ export default function BottomTabNavigator({navigation}) {
                 headerLeft: () => (
                     <Image
                         source={require('../../public/images/pip-head.png')}
-                        style={{width: 40, height: 40, marginLeft: 15,}}
+                        style={{width: 80, height: 80, marginLeft: 15,}}
                         resizeMode="contain"
                     />
                 ),
