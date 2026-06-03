@@ -30,6 +30,7 @@ export default function LoginScreen({navigation}) {
         // Basic login logic
         console.log('Email:', email);
         console.log('Password:', password);
+        navigation.navigate('Main');
     };
 
     const handleRegister = () => {

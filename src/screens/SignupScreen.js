@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
 import {globalStyles, colors} from "../styles/GlobalStyles";
 
-export default function SignupScreen() {
+export default function SignupScreen({navigation}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
@@ -12,11 +12,12 @@ export default function SignupScreen() {
         if (!name || !email || !password) {
             setErrorMessage('Please fill in all fields.');
             return;
+        } else {
+            navigation.navigate('Main');
         }
         setErrorMessage('');
         // Hardcoded
         console.log('Signing up with:', {name, email, password});
-        Alert.alert('Success', 'Account created successfully!');
     };
 
     return (
