@@ -29,8 +29,8 @@ export const colors = {
     textCard: '#FFFFFF',
 
     primaryButton: '#F09D67',
-    wrongButton: '#06D6A0',
-    rightButton: '#EF476F',
+    rightButton: '#06D6A0',
+    wrongButton: '#EF476F',
 
     //xp-bar
     xpBarFiller: '#676848',
