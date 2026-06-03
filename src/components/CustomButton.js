@@ -3,28 +3,29 @@ import {colors, globalStyles} from "../styles/GlobalStyles.js";
 import {Ionicons} from '@expo/vector-icons';
 
 
-export const CustomButton = ({variant, size, onPress, children, disabled}) => {
+export const CustomButton = ({variant, size, onPress, children, disabled, style}) => {
 
     const isRightAnswer = variant === 'rightAnswer';
     const isWrongAnswer = variant === 'wrongAnswer';
 
     return (
         <Pressable onPress={onPress} style={[
-            styles.ButtonContainer,
+            styles.buttonContainer,
             sizes[size],
             variants[variant],
-            disabled && {opacity: 0.3}
+            disabled && {opacity: 0.3},
+            style
         ]}>
-            <Text style={styles.ButtonText}>{children}</Text>
+            <Text style={styles.buttonText}>{children}</Text>
 
             {isRightAnswer && (
-                <View style={styles.IconContainer}>
+                <View style={styles.iconContainer}>
                     <Ionicons name="thumbs-up" size={18} color={'#047053'}></Ionicons>
                 </View>
             )}
 
             {isWrongAnswer && (
-                <View style={styles.IconContainer}>
+                <View style={styles.iconContainer}>
                     <Ionicons name="thumbs-down" size={18} color={'#802636'}></Ionicons>
                 </View>
             )}
@@ -64,14 +65,14 @@ const sizes = {
 };
 
 const styles = StyleSheet.create({
-    ButtonContainer: {
+    buttonContainer: {
         margin: 10,
     },
-    ButtonText: {
+    buttonText: {
         fontSize: globalStyles?.text.fontSize || 18,
         textAlign: 'center',
     },
-    IconContainer: {
+    iconContainer: {
         position: 'absolute',
         bottom: 8,
         right: 12,
