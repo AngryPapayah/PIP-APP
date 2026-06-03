@@ -1,11 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { globalStyles, colors } from '../styles/GlobalStyles';
+import {StyleSheet, Text, View} from 'react-native';
+import {globalStyles, colors} from '../styles/GlobalStyles';
+import TextBubble from '../components/TextBubble.js';
 
 export default function HomeScreen() {
     return (
         <View style={styles.container}>
-            <Text style={globalStyles?.text || styles.text}>Home Screen</Text>
+            <Text style={globalStyles?.text || styles.text}>Challenges</Text>
+            {/*<TextBubble text="Welcome to pip this is an app for parents"/>*/}
         </View>
     );
 }
