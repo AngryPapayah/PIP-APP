@@ -9,7 +9,7 @@ const conversation = [
     "Let's get started!"
 ];
 
-export default function LoginScreen() {
+export default function LoginScreen({navigation}) {
     // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -33,7 +33,8 @@ export default function LoginScreen() {
     };
 
     const handleRegister = () => {
-        console.log('Register tapped');
+        navigation.navigate('Signup');
+        // console.log('Register tapped');
     };
 
     return (
