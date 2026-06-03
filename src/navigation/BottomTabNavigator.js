@@ -6,7 +6,6 @@ import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
 import {Image, TouchableOpacity} from "react-native";
-import LoginScreen from "../screens/LoginScreen";
 
 const Tab = createBottomTabNavigator();
 
