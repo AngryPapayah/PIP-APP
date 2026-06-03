@@ -10,7 +10,7 @@
     "splash": {
       "image": "./public/images/pip-head.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFDFAD"
     },
     "ios": {
       "supportsTablet": true
@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./public/images/pip-head.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFDFAD"
       },
       "edgeToEdgeEnabled": true
     },
