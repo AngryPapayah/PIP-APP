@@ -32,6 +32,10 @@ export default function LoginScreen() {
         console.log('Password:', password);
     };
 
+    const handleRegister = () => {
+        console.log('Register tapped');
+    };
+
     return (
         <View style={styles.container}>
             <TextBubble
@@ -64,6 +68,11 @@ export default function LoginScreen() {
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
+            <Text style={styles.orText}> OR </Text>
+
+            <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleRegister}>
+                <Text style={styles.buttonText}>Sign in</Text>
+            </TouchableOpacity>
 
         </View>
     );
@@ -97,9 +106,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 10,
     },
+    registerButton: {
+        backgroundColor: colors?.primaryButton || '#F09D67',
+    },
     buttonText: {
         color: colors?.textMain || '#000000',
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    orText: {
+        fontSize: 16,
+        color: colors?.textMain || '#000000',
+        marginVertical: 10,
         fontWeight: 'bold',
     }
 });
