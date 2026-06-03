@@ -1,6 +1,6 @@
 import {Text, StyleSheet, Pressable, View} from 'react-native';
 import {colors, globalStyles} from "../styles/GlobalStyles.js";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import {Ionicons} from '@expo/vector-icons';
 
 
 export const CustomButton = ({variant, size, onPress, children, disabled}) => {
@@ -19,13 +19,13 @@ export const CustomButton = ({variant, size, onPress, children, disabled}) => {
 
             {isRightAnswer && (
                 <View style={styles.IconContainer}>
-                    <FontAwesome name="thumbs-up" size={18} color={'#047053'}></FontAwesome>
+                    <Ionicons name="thumbs-up" size={18} color={'#047053'}></Ionicons>
                 </View>
             )}
 
             {isWrongAnswer && (
                 <View style={styles.IconContainer}>
-                    <FontAwesome name="thumbs-down" size={18} color={'#802636'}></FontAwesome>
+                    <Ionicons name="thumbs-down" size={18} color={'#802636'}></Ionicons>
                 </View>
             )}
         </Pressable>
@@ -34,25 +34,25 @@ export const CustomButton = ({variant, size, onPress, children, disabled}) => {
 
 const variants = {
     primary: {
-        backgroundColor: colors.primaryButton,
+        backgroundColor: colors?.primaryButton || '#F09D67',
         borderWidth: 1,
         borderRadius: 10,
-        borderColor: colors.accent
+        borderColor: colors?.accent || '#784F4E'
     },
     rightAnswer: {
-        backgroundColor: colors.rightButton,
+        backgroundColor: colors?.rightButton || '#06D6A0',
         borderWidth: 1,
         borderRadius: 10,
-        borderColor: colors.accent,
+        borderColor: colors?.accent || '#784F4E',
         position: 'relative',
         paddingBottom: 20,
 
     },
     wrongAnswer: {
-        backgroundColor: colors.wrongButton,
+        backgroundColor: colors?.wrongButton || '#EF476F',
         borderWidth: 1,
         borderRadius: 10,
-        borderColor: colors.accent
+        borderColor: colors?.accent || '#784F4E'
     },
     icon: {backgroundColor: 'transparent'},
 }
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         margin: 10,
     },
     ButtonText: {
-        fontSize: globalStyles.text.fontSize,
+        fontSize: globalStyles?.text.fontSize || 18,
         textAlign: 'center',
     },
     IconContainer: {
