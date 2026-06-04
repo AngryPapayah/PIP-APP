@@ -1,28 +1,48 @@
 import React, {useState} from 'react';
 import {Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
+import {SafeAreaView} from "react-native-safe-area-context";
 import {globalStyles, colors} from "../styles/GlobalStyles";
+import {fetchAPI} from "../services/Fetch";
 
 export default function SignupScreen({navigation}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
         if (!name || !email || !password) {
             setErrorMessage('Please fill in all fields.');
             return;
-        } else {
-            navigation.navigate('Main');
         }
+
+        if (email === password) {
+            setErrorMessage('Password cannot be the same as your email.');
+            return;
+        }
+
+        setLoading(true);
+        const result = await fetchAPI('register', 'POST', {name, email, password});
+        setLoading(false);
+
+        if (result?.error) {
+            setErrorMessage(result.error);
+            return;
+        }
+
         setErrorMessage('');
-        // Hardcoded
-        console.log('Signing up with:', {name, email, password});
+        Alert.alert(
+            "Registration Successful",
+            "You can now log in with your new account.",
+            [
+                { text: "OK", onPress: () => navigation.navigate('Login') }
+            ]
+        );
     };
 
     return (
-
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.card}>
                 <Image
                     source={require('../../public/images/pip-head.png')}
@@ -56,11 +76,11 @@ export default function SignupScreen({navigation}) {
 
                 {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-                <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                    <Text style={styles.buttonText}>Sign Up</Text>
+                <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
+                    <Text style={styles.buttonText}>{loading ? 'Loading...' : 'Sign Up'}</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 

@@ -1,7 +1,18 @@
 import React, {useState} from "react";
-import {StyleSheet, Text, View, TextInput, TouchableOpacity, Image} from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    TextInput,
+    TouchableOpacity,
+    Image,
+    KeyboardAvoidingView,
+    Platform
+} from "react-native";
+import {SafeAreaView} from "react-native-safe-area-context";
 import {globalStyles, colors} from "../styles/GlobalStyles";
 import TextBubble from "../components/TextBubble";
+import {fetchAPI} from "../services/Fetch"
 
 const conversation = [
     "Welcome to P.I.P.",
@@ -14,6 +25,8 @@ export default function LoginScreen({navigation}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+
 
     // textbubble
     const [messageIndex, setMessageIndex] = useState(0);
@@ -44,51 +57,62 @@ export default function LoginScreen({navigation}) {
     };
 
     return (
-        <View style={styles.container}>
-            <TextBubble
-                text={conversation[messageIndex]}
-                onAnimationComplete={handleNextMessage}
-            />
-            <Image
-                source={require('../../public/images/pip-body.png')}
-                style={{width: 200, height: 200, marginLeft: 15,}}
-                resizeMode="contain"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#888"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#888"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
+        <SafeAreaView style={styles.safeArea}>
+            <KeyboardAvoidingView
+                style={{flex: 1}}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <View style={styles.container}>
+                    <TextBubble
+                        text={conversation[messageIndex]}
+                        onAnimationComplete={handleNextMessage}
+                    />
+                    <Image
+                        source={require('../../public/images/pip-body.png')}
+                        style={{width: 200, height: 200, marginLeft: 15,}}
+                        resizeMode="contain"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        placeholderTextColor="#888"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        placeholderTextColor="#888"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
 
-            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                    {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                        <Text style={styles.buttonText}>Login</Text>
+                    </TouchableOpacity>
 
-            <Text style={styles.orText}> OR </Text>
+                    <Text style={styles.orText}> OR </Text>
 
-            <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleRegister}>
-                <Text style={styles.buttonText}>Sign up</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleRegister}>
+                        <Text style={styles.buttonText}>Sign up</Text>
+                    </TouchableOpacity>
 
-        </View>
+                </View>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: colors?.primary || '#fff',
+    },
     container: {
         flex: 1,
         backgroundColor: colors?.primary || '#fff',
