@@ -40,6 +40,8 @@ export const colors = {
     //progress bar
     progressBarFiller: '#909160',
     progressBarBackground: '#E2C495',
+    progressBarActive: '#909160',
+    progressBarInactive: '#E2C495',
 
     warning: '#FFCC00',
     error: '#FF3B3B',
