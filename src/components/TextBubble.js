@@ -25,13 +25,13 @@ const styles = StyleSheet.create({
     container: {
         margin: 10,
         maxWidth: '80%',
-        alignItems: 'flex-start',
+        alignItems: 'flex-end',
     },
     bubble: {
         backgroundColor: colors?.textCard || '#FFFFFF',
         padding: 12,
         borderRadius: 15,
-        borderBottomLeftRadius: 0, 
+        borderBottomRightRadius: 0, 
     },
     text: {
         fontSize: 16,
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     tailContainer: {
         position: 'absolute',
         bottom: 0,
-        left: 0,
+        right: 0,
         width: 15,
         height: 15,
         overflow: 'hidden',
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         width: 15,
         height: 15,
         backgroundColor: colors?.textCard || '#FFFFFF',
-        borderBottomRightRadius: 15,
+        borderBottomLeftRadius: 15,
         transform: [{ translateY: -15 }],
     },
 });

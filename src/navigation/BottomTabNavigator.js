@@ -27,7 +27,7 @@ export default function BottomTabNavigator({navigation}) {
                     fontSize: 24,
                     fontWeight: 'bold',
                 },
-                headerTitle: 'P.I.P',
+                headerTitle: 'P.I.P.',
                 headerLeft: () => (
                     <Image
                         source={require('../../public/images/pip-head.png')}
