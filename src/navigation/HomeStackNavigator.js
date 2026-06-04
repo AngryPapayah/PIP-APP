@@ -7,7 +7,7 @@ const HomeStack = createStackNavigator();
 
 export default function HomeStackScreen() {
     return (
-        <HomeStack.Navigator screenOptions={{headerShown: false}} id={}>
+        <HomeStack.Navigator screenOptions={{headerShown: false}}>
             <HomeStack.Screen name="HomeScreen" component={HomeScreen}/>
             <HomeStack.Screen name="Courses" component={CoursesList}/>
             <HomeStack.Screen name="Modules" component={ModulesList}/>

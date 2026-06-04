@@ -40,8 +40,7 @@ export default function BottomTabNavigator({navigation}) {
                         <Ionicons name="menu" size={30} color={colors.textCard}/>
                     </TouchableOpacity>
                 ),
-            }}
-            id={}>
+            }}>
 
             <Tab.Screen
                 name="Hamsterverse"
