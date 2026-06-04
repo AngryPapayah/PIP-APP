@@ -3,7 +3,7 @@ import {CustomButton} from "./CustomButton";
 import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../styles/GlobalStyles";
 
-export const Card = ({iconName, lessonTitle, description, difficulty, onPress}) => {
+export const Card = ({iconName, lessonTitle, description, difficulty, buttonText, onPress}) => {
 
     const isLocked = iconName === 'lock-closed';
     const isFinished = iconName === 'checkmark-circle';
@@ -14,9 +14,9 @@ export const Card = ({iconName, lessonTitle, description, difficulty, onPress}) 
             <Text style={styles.titleText}>{lessonTitle}</Text>
             <Ionicons name={iconName} size={100} color={isFinished ? '#464712' : '#000'}></Ionicons>
             <Text>{difficulty}</Text>
-            <Text style={styles.descriptionText}>{description}</Text>
+            <Text style={styles.descriptionText} numberOfLines={5}>{description}</Text>
             <CustomButton variant="primary" size="md" disabled={isLocked} onPress={onPress}
-                          style={{alignSelf: 'stretch'}}>Start Lesson</CustomButton>
+                          style={{alignSelf: 'stretch'}}>{buttonText}</CustomButton>
             {isFinished && <View style={styles.finishedCardOverlay}/>}
         </Pressable>
 
@@ -34,6 +34,10 @@ const styles = StyleSheet.create({
         padding: 10,
         position: 'relative',
         overflow: 'hidden',
+        alignSelf: 'stretch',
+        flex: 1,
+
+        aspectRatio: 1,
     },
     lockedCard: {
         opacity: 0.5
