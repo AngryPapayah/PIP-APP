@@ -17,7 +17,6 @@ export default function CoursesList() {
                 method: "GET",
                 headers: {
                     "Accept": "application/json",
-                    // "x-delay-ms": "2000"
                 }
             })
 
@@ -34,14 +33,11 @@ export default function CoursesList() {
         <View style={styles.container}>
             <FlatList
                 data={courses}
-                keyExtractor={(item) => item.id}
-                numColumns={2}
+                keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContainer}
                 //gives styling to the content of the list
-                columnWrapperStyle={styles.columnWrapper}
-                //gives styling to the space in between the items of the list
                 renderItem={({item}) =>
-                    (<View>
+                    (<View style={styles.itemWrapper}>
                         <CoursesListItem course={item}/>
                     </View>)
 
@@ -58,8 +54,7 @@ const styles = StyleSheet.create({
     listContainer: {
         padding: 20,
     },
-    columnWrapper: {
-        justifyContent: 'space-between',
-        marginBottom: 15,
-    },
+    itemWrapper: {
+        marginBottom: 20
+    }
 });

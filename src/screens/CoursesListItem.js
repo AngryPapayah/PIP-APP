@@ -13,6 +13,7 @@ export default function CoursesListItem({course}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        padding: 10,
 
     },
 });

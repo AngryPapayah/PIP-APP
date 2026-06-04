@@ -14,7 +14,7 @@ export const Card = ({iconName, lessonTitle, description, difficulty, buttonText
             <Text style={styles.titleText}>{lessonTitle}</Text>
             <Ionicons name={iconName} size={100} color={isFinished ? '#464712' : '#000'}></Ionicons>
             <Text>{difficulty}</Text>
-            <Text style={styles.descriptionText}>{description}</Text>
+            <Text style={styles.descriptionText} numberOfLines={5}>{description}</Text>
             <CustomButton variant="primary" size="md" disabled={isLocked} onPress={onPress}
                           style={{alignSelf: 'stretch'}}>{buttonText}</CustomButton>
             {isFinished && <View style={styles.finishedCardOverlay}/>}
@@ -36,6 +36,8 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         alignSelf: 'stretch',
         flex: 1,
+
+        aspectRatio: 1,
     },
     lockedCard: {
         opacity: 0.5
