@@ -1,11 +1,11 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/HomeScreen';
 import {colors} from '../styles/GlobalStyles';
 import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
 import {Image, TouchableOpacity} from "react-native";
+import HomeStackScreen from "./HomeStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -41,7 +41,7 @@ export default function BottomTabNavigator({navigation}) {
                     </TouchableOpacity>
                 ),
             }}
-        >
+            id={}>
 
             <Tab.Screen
                 name="Hamsterverse"
@@ -55,7 +55,7 @@ export default function BottomTabNavigator({navigation}) {
 
             <Tab.Screen
                 name="Home"
-                component={HomeScreen}
+                component={HomeStackScreen}
                 options={{
                     tabBarIcon: ({color, size}) => (
                         <Ionicons name="home" color={color} size={size}/>
