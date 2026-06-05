@@ -1,5 +1,5 @@
 import {StyleSheet, View} from "react-native";
-import {Card} from "../components/Card";
+import {Card} from "../../components/Card";
 import {useNavigation} from "@react-navigation/native";
 
 export default function CoursesListItem({course}) {

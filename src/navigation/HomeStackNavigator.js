@@ -1,7 +1,8 @@
 import {createStackNavigator} from "@react-navigation/stack";
-import CoursesList from "../screens/CoursesList";
-import ModulesList from "../screens/ModulesList";
+import CoursesList from "../screens/courses/CoursesList";
+import ModulesList from "../screens/courses/modules/ModulesList";
 import HomeScreen from "../screens/HomeScreen";
+import LessonsList from "../screens/courses/modules/lessons/LessonsList";
 
 const HomeStack = createStackNavigator();
 
@@ -11,6 +12,7 @@ export default function HomeStackScreen() {
             <HomeStack.Screen name="HomeScreen" component={HomeScreen}/>
             <HomeStack.Screen name="Courses" component={CoursesList}/>
             <HomeStack.Screen name="Modules" component={ModulesList}/>
+            <HomeStack.Screen name="Lessons" component={LessonsList}/>
         </HomeStack.Navigator>
     );
 }

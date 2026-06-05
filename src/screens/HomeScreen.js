@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {colors} from '../styles/GlobalStyles';
-import CoursesList from "./CoursesList";
+import CoursesList from "./courses/CoursesList";
 
 export default function HomeScreen() {
     return (

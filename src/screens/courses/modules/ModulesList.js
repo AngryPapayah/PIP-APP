@@ -3,7 +3,7 @@ import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import ModulesListItem from "./ModulesListItem";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {Ionicons} from '@expo/vector-icons';
-import {colors} from "../styles/GlobalStyles";
+import {colors} from "../../../styles/GlobalStyles";
 
 export default function ModulesList() {
 
@@ -53,7 +53,7 @@ export default function ModulesList() {
                 //gives styling to the content of the list
                 renderItem={({item}) =>
                     (<View style={styles.itemWrapper}>
-                        <ModulesListItem module={item}/>
+                        <ModulesListItem module={item} courseId={courseId}/>
                     </View>)
 
                 }
