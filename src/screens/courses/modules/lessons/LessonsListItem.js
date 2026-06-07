@@ -1,13 +1,17 @@
 import {StyleSheet, View} from "react-native";
 import {Card} from "../../../../components/Card";
+import {useNavigation} from "@react-navigation/native";
 
-export default function LessonsListItem({lesson}) {
+export default function LessonsListItem({lesson, courseId, moduleId}) {
+
+    const navigation = useNavigation()
 
     return (
         <View style={styles.container}>
             <Card iconName="eye" lessonTitle={lesson.title}
                   estimated_time={`Estimated minutes: ${lesson.estimated_minutes}`}
-                  description={lesson.description} buttonText={"Start lesson"}></Card>
+                  description={lesson.description} buttonText={"Start lesson"}
+                  onPress={() => navigation.navigate("Questions", {courseId, moduleId, lessonId: lesson.id})}></Card>
         </View>
     )
 }

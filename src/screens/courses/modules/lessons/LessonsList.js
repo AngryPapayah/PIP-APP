@@ -53,7 +53,7 @@ export default function LessonsList() {
                 //gives styling to the content of the list
                 renderItem={({item}) =>
                     (<View style={styles.itemWrapper}>
-                        <LessonsListItem lesson={item}/>
+                        <LessonsListItem lesson={item} courseId={courseId} moduleId={moduleId}/>
                     </View>)
 
                 }
