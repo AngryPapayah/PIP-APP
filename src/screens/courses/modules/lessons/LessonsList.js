@@ -4,14 +4,14 @@ import {useNavigation, useRoute} from "@react-navigation/native";
 import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../../../../styles/GlobalStyles";
 import LessonsListItem from "./LessonsListItem";
+import {fetchAPI} from "../../../../services/Fetch";
 
 export default function LessonsList() {
 
     const route = useRoute();
     const navigation = useNavigation();
     const {courseId, moduleId} = route.params;
-
-    const url = `http://145.24.223.106:8000/api/courses/${courseId}/modules/${moduleId}/lessons`
+    
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(true)
 
@@ -22,14 +22,15 @@ export default function LessonsList() {
     async function getLessons() {
         setLoading(true)
         try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                }
-            })
 
-            const data = await response.json()
+            const data = await fetchAPI(`courses/${courseId}/modules/${moduleId}/lessons`, 'GET')
+
+            if (data && data.error) {
+                console.error("API Error:", data.error);
+                setLoading(false);
+                return;
+            }
+
             setLessons(data);
             setLoading(false)
 

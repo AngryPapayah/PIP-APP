@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet, View, Image} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import React, {useEffect, useState} from "react";
 import TextBubble from "./TextBubble";
+import {fetchAPI} from "../services/Fetch";
 
 export default function MultipleChoice({question, attemptId, onNext}) {
 
@@ -33,18 +34,15 @@ export default function MultipleChoice({question, attemptId, onNext}) {
 
         try {
             //send chosen answer to server so we can check
-            const answerUrl = `http://145.24.223.106:8000/api/progress/attempts/${attemptId}/answers`
-            await fetch(answerUrl, {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    questionId: question.id,
-                    answerId: answer.id
-                })
+            const answerData = await fetchAPI(`progress/attempts/${attemptId}/answers`, 'POST', {
+                questionId: question.id,
+                answerId: answer.id
             })
+
+            if (answerData && answerData.error) {
+                console.error("API Error:", answerData.error);
+            }
+
 
         } catch (error) {
             console.error("Er is een fout opgetreden", error);
