@@ -3,6 +3,7 @@ import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {colors} from "../styles/GlobalStyles";
+import SwipeCard from "../components/SwipeCard";
 
 export default function QuestionsScreen() {
 
@@ -64,7 +65,10 @@ export default function QuestionsScreen() {
                 })
             )
 
-            setQuestions(fullQuestions)
+            // Shuffle the questions array to randomize the order
+            const shuffledQuestions = [...fullQuestions].sort(() => Math.random() - 0.5);
+
+            setQuestions(shuffledQuestions)
             setLoading(false)
 
 
@@ -79,6 +83,7 @@ export default function QuestionsScreen() {
         setLoading(true)
         if (currentIndex < questions.length - 1) {
             setCurrentIndex(currentIndex + 1)
+            setLoading(false)
         } else {
             try {
                 //complete the lesson
@@ -102,7 +107,7 @@ export default function QuestionsScreen() {
     //temporary loading screen
     if (loading) {
         return (
-            <View>
+            <View style={styles.container}>
                 <Text>Questions are loading...</Text>
             </View>
         )
@@ -111,7 +116,7 @@ export default function QuestionsScreen() {
     //fallback if api list is empty
     if (questions.length === 0) {
         return (
-            <View>
+            <View style={styles.container}>
                 <Text>No questions found for this lesson</Text>
             </View>
         )
@@ -129,7 +134,7 @@ export default function QuestionsScreen() {
             {currentQuestion?.question_type === "multiple_choice" ? (
                 <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}></MultipleChoice>
             ) : (
-                <Text>here swipe component</Text>
+                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}></SwipeCard>
             )}
         </View>
     )
