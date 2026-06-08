@@ -13,12 +13,14 @@ export default function LessonsList() {
 
     const url = `http://145.24.223.106:8000/api/courses/${courseId}/modules/${moduleId}/lessons`
     const [lessons, setLessons] = useState([]);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         getLessons()
     }, [courseId, moduleId])
 
     async function getLessons() {
+        setLoading(true)
         try {
             const response = await fetch(url, {
                 method: "GET",
@@ -29,6 +31,7 @@ export default function LessonsList() {
 
             const data = await response.json()
             setLessons(data);
+            setLoading(false)
 
 
         } catch (error) {
@@ -36,6 +39,14 @@ export default function LessonsList() {
         }
     }
 
+    //temporary loading screen
+    if (loading) {
+        return (
+            <View>
+                <Text>Lessons are loading...</Text>
+            </View>
+        )
+    }
 
     return (
 

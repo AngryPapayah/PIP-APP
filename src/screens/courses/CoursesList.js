@@ -1,17 +1,19 @@
 import {useEffect, useState} from "react";
-import {FlatList, View, StyleSheet} from "react-native";
+import {FlatList, View, StyleSheet, Text} from "react-native";
 import CoursesListItem from "./CoursesListItem.js";
 
 export default function CoursesList() {
 
     const url = "http://145.24.223.106:8000/api/courses"
     const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         getCourses()
     }, [])
 
     async function getCourses() {
+        setLoading(true)
         try {
             const response = await fetch(url, {
                 method: "GET",
@@ -22,11 +24,21 @@ export default function CoursesList() {
 
             const data = await response.json()
             setCourses(data);
+            setLoading(false)
 
 
         } catch (error) {
             console.error("Er is een fout opgetreden", error);
         }
+    }
+
+    //temporary loading screen
+    if (loading) {
+        return (
+            <View>
+                <Text>Courses are loading...</Text>
+            </View>
+        )
     }
 
     return (
