@@ -1,5 +1,5 @@
 import {CustomButton} from "./CustomButton";
-import {ScrollView, StyleSheet, View, Text, Image} from "react-native";
+import {ScrollView, StyleSheet, View, Image} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import React, {useEffect, useState} from "react";
 import TextBubble from "./TextBubble";
@@ -53,12 +53,15 @@ export default function MultipleChoice({question, attemptId, onNext}) {
 
     //changing pips image after answer is given
     let pipImage = require('../../public/images/pip-body.png')
+    let pipAltText = "Pip the hamster asking you a question"
 
     if (hasAnswered) {
         if (isCorrectAnswer) {
             pipImage = require('../../public/images/pip-good.png')
+            pipAltText = "Pip the hamster holding a sign with a green checkmark"
         } else {
             pipImage = require('../../public/images/pip-bad.png')
+            pipAltText = "Pip the hamster holding a sign with a red cross"
         }
     }
 
@@ -77,6 +80,8 @@ export default function MultipleChoice({question, attemptId, onNext}) {
                         source={pipImage}
                         style={{width: 200, height: 200, marginLeft: 15,}}
                         resizeMode="contain"
+                        accessible={true}
+                        accessibilityLabel={pipAltText}
                     />
 
                     <View>
@@ -95,6 +100,8 @@ export default function MultipleChoice({question, attemptId, onNext}) {
                         source={pipImage}
                         style={{width: 200, height: 200, marginLeft: 15,}}
                         resizeMode="contain"
+                        accessible={true}
+                        accessibilityLabel={pipAltText}
                     />
                 </View>
             )}
