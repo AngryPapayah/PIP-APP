@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     Image,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    ScrollView
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {globalStyles, colors} from "../styles/GlobalStyles";
@@ -40,16 +41,29 @@ export default function LoginScreen({navigation}) {
         }
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!email || !password) {
             setErrorMessage('Please fill in all fields.');
             return;
-        } else {
-            setErrorMessage('');
-            navigation.navigate('Main');
         }
-        // Hardcoded
-        console.log('Logging in with:', {email, password});
+        setLoading(true);
+        setErrorMessage('');
+
+        try {
+            const data = await fetchAPI('login', 'POST', {email, password});
+
+            if (data.error) {
+                setErrorMessage(data.error);
+            } else {
+                // Handle successful login, e.g., store token and navigate
+                console.log('Login successful:', data);
+                navigation.navigate('Main');
+            }
+        } catch (error) {
+            setErrorMessage('An unexpected error occurred. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleRegister = () => {
@@ -59,10 +73,14 @@ export default function LoginScreen({navigation}) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
-                style={{flex: 1}}
+                style={styles.keyboardAvoidingView}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                <View style={styles.container}>
+                <ScrollView 
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <TextBubble
                         text={conversation[messageIndex]}
                         onAnimationComplete={handleNextMessage}
@@ -92,8 +110,8 @@ export default function LoginScreen({navigation}) {
 
                     {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                        <Text style={styles.buttonText}>Login</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+                        <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
                     </TouchableOpacity>
 
                     <Text style={styles.orText}> OR </Text>
@@ -102,7 +120,7 @@ export default function LoginScreen({navigation}) {
                         <Text style={styles.buttonText}>Sign up</Text>
                     </TouchableOpacity>
 
-                </View>
+                </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -113,9 +131,12 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors?.primary || '#fff',
     },
-    container: {
+    keyboardAvoidingView: {
         flex: 1,
-        backgroundColor: colors?.primary || '#fff',
+        width: '100%',
+    },
+    scrollContainer: {
+        flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,

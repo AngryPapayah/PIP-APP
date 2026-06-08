@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
+import {Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, ScrollView, Platform} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {globalStyles, colors} from "../styles/GlobalStyles";
 import {fetchAPI} from "../services/Fetch";
@@ -43,43 +43,54 @@ export default function SignupScreen({navigation}) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.card}>
-                <Image
-                    source={require('../../public/images/pip-head.png')}
-                    style={styles.cardImage}
-                    resizeMode="contain"
-                />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.keyboardAvoidingView}
+            >
+                <ScrollView 
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.card}>
+                        <Image
+                            source={require('../../public/images/pip-head.png')}
+                            style={styles.cardImage}
+                            resizeMode="contain"
+                        />
 
-                <Text style={globalStyles?.title || styles.title}>Create an Account</Text>
+                        <Text style={globalStyles?.title || styles.title}>Create an Account</Text>
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Name"
-                    value={name}
-                    onChangeText={setName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Name"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Email"
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                        />
 
-                {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-                <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
-                    <Text style={styles.buttonText}>{loading ? 'Loading...' : 'Sign Up'}</Text>
-                </TouchableOpacity>
-            </View>
+                        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
+                            <Text style={styles.buttonText}>{loading ? 'Loading...' : 'Sign Up'}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -89,6 +100,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors?.primary || '#fff',
+    },
+    keyboardAvoidingView: {
+        flex: 1,
+        width: '100%',
+    },
+    scrollContainer: {
+        flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
