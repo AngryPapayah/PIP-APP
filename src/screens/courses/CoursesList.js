@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import {FlatList, View, StyleSheet, Text} from "react-native";
 import CoursesListItem from "./CoursesListItem.js";
+import {fetchAPI} from "../../services/Fetch";
 
 export default function CoursesList() {
-
-    const url = "http://145.24.223.106:8000/api/courses"
+    
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true)
 
@@ -15,14 +15,15 @@ export default function CoursesList() {
     async function getCourses() {
         setLoading(true)
         try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                }
-            })
 
-            const data = await response.json()
+            const data = await fetchAPI("courses", 'GET')
+
+            if (data && data.error) {
+                console.error("API Error:", data.error);
+                setLoading(false);
+                return;
+            }
+
             setCourses(data);
             setLoading(false)
 
