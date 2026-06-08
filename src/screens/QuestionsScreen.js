@@ -3,6 +3,7 @@ import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {colors} from "../styles/GlobalStyles";
+import {fetchAPI} from "../services/Fetch";
 
 export default function QuestionsScreen() {
 
@@ -10,13 +11,13 @@ export default function QuestionsScreen() {
     const navigation = useNavigation();
     const {courseId, moduleId, lessonId} = route.params;
 
-    const questionUrl = `http://145.24.223.106:8000/api/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/questions`
-    const startUrl = `http://145.24.223.106:8000/api/progress/lessons/${lessonId}/start`
-
     const [questions, setQuestions] = useState([]);
     const [attemptId, setAttemptId] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [loading, setLoading] = useState(true)
+
+    //temporary user id
+    const userId = 1;
 
 
     useEffect(() => {
@@ -28,36 +29,38 @@ export default function QuestionsScreen() {
         try {
 
             //start the lesson and save the attempt id
-            const startResponse = await fetch(startUrl, {
-                method: 'POST',
-                headers: {
-                    "Accept": "application/json",
-                }
-            })
-            const startData = await startResponse.json()
+            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', {userId: userId})
+
+            if (startData && startData.error) {
+                console.error("API Error:", startData.error);
+                setLoading(false);
+                return;
+            }
+
             setAttemptId(startData.id)
 
             //get the questions from the lesson
-            const questionResponse = await fetch(questionUrl, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                }
-            })
-            const questionData = await questionResponse.json()
+            const questionData = await fetchAPI(`courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
+
+            if (questionData && questionData.error) {
+                console.error("API Error:", questionData.error);
+                setLoading(false);
+                return;
+            }
 
 
             //get per question the belonging answers
             const fullQuestions = await Promise.all(
                 questionData.map(async (question) => {
-                    const answerUrl = `http://145.24.223.106:8000/api/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`
-                    const answerResponse = await fetch(answerUrl, {
-                        method: "GET",
-                        headers: {
-                            "Accept": "application/json",
-                        }
-                    })
-                    const answerData = await answerResponse.json()
+
+                    const answerData = await fetchAPI(`courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET')
+
+                    if (answerData && answerData.error) {
+                        console.error("API Error:", answerData.error);
+                        setLoading(false);
+                        return;
+                    }
+
                     console.log("DIT GEEFT DE ANTWOORDEN API TERUG:", answerData);
                     //return the question and attach the associated answers array
                     return {...question, answers: answerData.answers}
@@ -82,13 +85,13 @@ export default function QuestionsScreen() {
         } else {
             try {
                 //complete the lesson
-                const completeUrl = `http://145.24.223.106:8000/api/progress/attempts/${attemptId}/complete`
-                const completeResponse = await fetch(completeUrl, {
-                    method: "POST",
-                    headers: {
-                        "Accept": "application/json",
-                    }
-                })
+                const completeData = await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', {userId: userId})
+
+                if (completeData && completeData.error) {
+                    console.error("API Error:", completeData.error);
+                    setLoading(false);
+                    return;
+                }
 
                 navigation.navigate("Modules")
                 setLoading(false)

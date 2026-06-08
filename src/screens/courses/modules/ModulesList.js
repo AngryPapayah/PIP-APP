@@ -4,6 +4,7 @@ import ModulesListItem from "./ModulesListItem";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../../../styles/GlobalStyles";
+import {fetchAPI} from "../../../services/Fetch";
 
 export default function ModulesList() {
 
@@ -11,7 +12,6 @@ export default function ModulesList() {
     const navigation = useNavigation();
     const {courseId} = route.params;
 
-    const url = `http://145.24.223.106:8000/api/courses/${courseId}/modules`
     const [modules, setModules] = useState([]);
     const [loading, setLoading] = useState(true)
 
@@ -24,14 +24,14 @@ export default function ModulesList() {
         setLoading(true)
 
         try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                }
-            })
+            const data = await fetchAPI(`courses/${courseId}/modules`, 'GET')
 
-            const data = await response.json()
+            if (data && data.error) {
+                console.error("API Error:", data.error);
+                setLoading(false);
+                return;
+            }
+
             setModules(data);
             setLoading(false)
 
