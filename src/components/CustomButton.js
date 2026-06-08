@@ -1,4 +1,4 @@
-import {Text, StyleSheet, Pressable, View} from 'react-native';
+import {Text, StyleSheet, View, TouchableOpacity} from 'react-native';
 import {colors, globalStyles} from "../styles/GlobalStyles.js";
 import {Ionicons} from '@expo/vector-icons';
 
@@ -9,7 +9,7 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
     const isWrongAnswer = variant === 'wrongAnswer';
 
     return (
-        <Pressable onPress={onPress} style={[
+        <TouchableOpacity onPress={onPress} style={[
             styles.buttonContainer,
             sizes[size],
             variants[variant],
@@ -29,7 +29,7 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
                     <Ionicons name="thumbs-down" size={18} color={'#802636'}></Ionicons>
                 </View>
             )}
-        </Pressable>
+        </TouchableOpacity>
     )
 }
 
