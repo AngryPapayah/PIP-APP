@@ -3,6 +3,7 @@ import {View, StyleSheet, Image, Text, TouchableOpacity, PanResponder, Animated,
 import TextBubble from './TextBubble';
 import {CustomButton} from './CustomButton';
 import {colors} from '../styles/GlobalStyles';
+import {fetchAPI} from "../services/Fetch";
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
@@ -13,7 +14,7 @@ export default function SwipeCard({question, attemptId, onNext}) {
 
     const position = useRef(new Animated.ValueXY()).current;
 
-    const handleAnswerLogic = (direction) => {
+    const handleAnswerLogic = async (direction) => {
         // This function is called AFTER the card has swiped away
         const answer = direction === 'left' ? question.answers[0] : question.answers[1];
         if (!answer) return;
@@ -22,18 +23,14 @@ export default function SwipeCard({question, attemptId, onNext}) {
         setIsCorrectAnswer(answer.is_correct === 1 || answer.is_correct === true);
 
         // Post the answer to the server
-        const answerUrl = `http://145.24.223.106:8000/api/progress/attempts/${attemptId}/answers`;
-        fetch(answerUrl, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                questionId: question.id,
-                answerId: answer.id,
-            }),
-        }).catch(error => console.error("Something went wrong", error));
+        const result = await fetchAPI(`progress/attempts/${attemptId}/answers`, 'POST', {
+            questionId: question.id,
+            answerId: answer.id,
+        });
+
+        if (result?.error) {
+            console.error("Something went wrong", result.error);
+        }
     };
 
     const forceSwipe = (direction) => {
