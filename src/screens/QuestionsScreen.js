@@ -1,8 +1,9 @@
 import MultipleChoice from "../components/MultipleChoice";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {SafeAreaView, StyleSheet, Text, View} from "react-native";
 import {colors} from "../styles/GlobalStyles";
+import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
 
 export default function QuestionsScreen() {
@@ -67,7 +68,10 @@ export default function QuestionsScreen() {
                 })
             )
 
-            setQuestions(fullQuestions)
+            // Shuffle the questions array to randomize the order
+            const shuffledQuestions = [...fullQuestions].sort(() => Math.random() - 0.5);
+
+            setQuestions(shuffledQuestions)
             setLoading(false)
 
 
@@ -82,6 +86,7 @@ export default function QuestionsScreen() {
         setLoading(true)
         if (currentIndex < questions.length - 1) {
             setCurrentIndex(currentIndex + 1)
+            setLoading(false)
         } else {
             try {
                 //complete the lesson
@@ -105,25 +110,25 @@ export default function QuestionsScreen() {
     //temporary loading screen
     if (loading) {
         return (
-            <View>
+            <SafeAreaView style={styles.container}>
                 <Text>Questions are loading...</Text>
-            </View>
+            </SafeAreaView>
         )
     }
 
     //fallback if api list is empty
     if (questions.length === 0) {
         return (
-            <View>
+            <SafeAreaView style={styles.container}>
                 <Text>No questions found for this lesson</Text>
-            </View>
+            </SafeAreaView>
         )
     }
 
     //select active question based on the current index
     const currentQuestion = questions[currentIndex];
 
-    return (<View style={styles.container}>
+    return (<SafeAreaView style={styles.container}>
 
             {/*temporary progress visualisation*/}
             <Text style={styles.progressText}>Question {currentIndex + 1} of {questions.length}</Text>
@@ -132,9 +137,9 @@ export default function QuestionsScreen() {
             {currentQuestion?.question_type === "multiple_choice" ? (
                 <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}></MultipleChoice>
             ) : (
-                <Text>here swipe component</Text>
+                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}></SwipeCard>
             )}
-        </View>
+        </SafeAreaView>
     )
 
 }

@@ -7,6 +7,7 @@ import {Ionicons} from '@expo/vector-icons';
 import {Image, TouchableOpacity} from "react-native";
 import HomeStackScreen from "./HomeStackNavigator";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
+import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
@@ -61,10 +62,20 @@ export default function BottomTabNavigator() {
             <Tab.Screen
                 name="Home"
                 component={HomeStackScreen}
-                options={{
-                    tabBarIcon: ({color, size}) => (
-                        <Ionicons name="home" color={color} size={size}/>
-                    ),
+                options={({route}) => {
+                    const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeScreen';
+                    const isQuestionsScreen = routeName === 'Questions';
+
+                    return {
+                        headerShown: !isQuestionsScreen,
+                        tabBarStyle: {
+                            display: isQuestionsScreen ? 'none' : 'flex',
+                            backgroundColor: colors.navbar,
+                        },
+                        tabBarIcon: ({color, size}) => (
+                            <Ionicons name="home" color={color} size={size}/>
+                        ),
+                    };
                 }}
             />
 
