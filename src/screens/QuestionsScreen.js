@@ -5,6 +5,7 @@ import {SafeAreaView, StyleSheet, Text, View} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
+import ProgressBar from "../components/ProgressBar";
 
 export default function QuestionsScreen() {
 
@@ -128,10 +129,10 @@ export default function QuestionsScreen() {
     //select active question based on the current index
     const currentQuestion = questions[currentIndex];
 
-    return (<SafeAreaView style={styles.container}>
-
-            {/*temporary progress visualisation*/}
-            <Text style={styles.progressText}>Question {currentIndex + 1} of {questions.length}</Text>
+    return (
+        <SafeAreaView style={styles.container}>
+            {/*progress visualisation*/}
+            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length} />
 
             {/*rendering component based on question type*/}
             {currentQuestion?.question_type === "multiple_choice" ? (
@@ -149,11 +150,5 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         backgroundColor: colors?.primary || '#FFDFAD',
-    },
-    progressText: {
-        textAlign: 'center',
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#666'
     }
 });
