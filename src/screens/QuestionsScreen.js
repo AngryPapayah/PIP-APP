@@ -1,7 +1,7 @@
 import MultipleChoice from "../components/MultipleChoice";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {SafeAreaView, StyleSheet, Text, View} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
@@ -110,25 +110,25 @@ export default function QuestionsScreen() {
     //temporary loading screen
     if (loading) {
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <Text>Questions are loading...</Text>
-            </View>
+            </SafeAreaView>
         )
     }
 
     //fallback if api list is empty
     if (questions.length === 0) {
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <Text>No questions found for this lesson</Text>
-            </View>
+            </SafeAreaView>
         )
     }
 
     //select active question based on the current index
     const currentQuestion = questions[currentIndex];
 
-    return (<View style={styles.container}>
+    return (<SafeAreaView style={styles.container}>
 
             {/*temporary progress visualisation*/}
             <Text style={styles.progressText}>Question {currentIndex + 1} of {questions.length}</Text>
@@ -139,7 +139,7 @@ export default function QuestionsScreen() {
             ) : (
                 <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}></SwipeCard>
             )}
-        </View>
+        </SafeAreaView>
     )
 
 }
