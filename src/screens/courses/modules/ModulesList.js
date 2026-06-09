@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import ModulesListItem from "./ModulesListItem";
+import {StyleSheet, Text, View} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
-import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../../../styles/GlobalStyles";
 import {fetchAPI} from "../../../services/Fetch";
 
@@ -29,11 +27,26 @@ export default function ModulesList() {
             if (data && data.error) {
                 console.error("API Error:", data.error);
                 setLoading(false);
+                navigation.goBack();
                 return;
             }
 
-            setModules(data);
-            setLoading(false)
+            // setModules(data);
+            // setLoading(false)
+
+
+            if (data && data.length > 0) {
+                //only takes the first module
+                const firstModuleId = data[0].id;
+
+                navigation.replace("Lessons", {
+                    courseId: courseId,
+                    moduleId: firstModuleId
+                });
+            } else {
+                console.warn("Deze cursus heeft nog geen modules.");
+                navigation.goBack();
+            }
 
 
         } catch (error) {
@@ -52,25 +65,29 @@ export default function ModulesList() {
 
     return (
 
-        <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"}></Ionicons>
-                </TouchableOpacity>
-                <Text style={styles.text}>Your Modules about {modules[0]?.course_name}</Text>
-            </View>
-            <FlatList
-                data={modules}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.listContainer}
-                //gives styling to the content of the list
-                renderItem={({item}) =>
-                    (<View style={styles.itemWrapper}>
-                        <ModulesListItem module={item} courseId={courseId}/>
-                    </View>)
+        // <View style={styles.container}>
+        //     <View style={styles.headerContainer}>
+        //         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        //             <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"}></Ionicons>
+        //         </TouchableOpacity>
+        //         <Text style={styles.text}>Your Modules about {modules[0]?.course_name}</Text>
+        //     </View>
+        //     <FlatList
+        //         data={modules}
+        //         keyExtractor={(item) => item.id.toString()}
+        //         contentContainerStyle={styles.listContainer}
+        //         //gives styling to the content of the list
+        //         renderItem={({item}) =>
+        //             (<View style={styles.itemWrapper}>
+        //                 <ModulesListItem module={item} courseId={courseId}/>
+        //             </View>)
+        //
+        //         }
+        //     />
+        // </View>
 
-                }
-            />
+        <View style={styles.container}>
+            <Text style={styles.text}>Loading Lessons...</Text>
         </View>
 
     )
