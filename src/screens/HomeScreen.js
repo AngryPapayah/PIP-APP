@@ -1,13 +1,13 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {colors} from '../styles/GlobalStyles';
-import CoursesList from "./courses/CoursesList";
+import ModulesList from "./courses/modules/ModulesList";
 
 export default function HomeScreen() {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Your Courses</Text>
-            <CoursesList></CoursesList>
+            <Text style={styles.text}>Your Modules</Text>
+            <ModulesList></ModulesList>
         </View>
     );
 }

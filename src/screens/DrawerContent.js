@@ -7,20 +7,20 @@ import {useFilter} from "../contexts/FilterContext";
 
 export default function DrawerContent(props) {
 
-    const [courses, setCourses] = useState([])
+    const [modules, setModules] = useState([])
     const [loading, setLoading] = useState(true)
 
     const {selectedTitle, setSelectedTitle} = useFilter()
 
     useEffect(() => {
-        getDrawerCourses()
+        getDrawerModules()
     }, []);
 
-    async function getDrawerCourses() {
+    async function getDrawerModules() {
         setLoading(true)
         try {
 
-            const data = await fetchAPI("courses", 'GET')
+            const data = await fetchAPI("courses/1/modules", 'GET')
 
             if (data && data.error) {
                 console.error("API Error:", data.error);
@@ -28,7 +28,7 @@ export default function DrawerContent(props) {
                 return;
             }
 
-            setCourses(data);
+            setModules(data);
             setLoading(false)
 
 
@@ -41,7 +41,7 @@ export default function DrawerContent(props) {
     if (loading) {
         return (
             <View>
-                <Text>Courses are loading...</Text>
+                <Text>Modules are loading...</Text>
             </View>
         )
     }
@@ -49,7 +49,7 @@ export default function DrawerContent(props) {
     return (
         <DrawerContentScrollView {...props} style={{backgroundColor: colors.navbar}}>
             <View style={styles.container}>
-                <Text style={styles.text}>Filter your courses</Text>
+                <Text style={styles.text}>Filter your Modules</Text>
 
                 <View>
 
@@ -66,21 +66,21 @@ export default function DrawerContent(props) {
                     </TouchableOpacity>
 
 
-                    {/*show courses and click to filter*/}
-                    {courses.map((course) => {
+                    {/*show modules and click to filter*/}
+                    {modules.map((module) => {
 
-                        const isActive = selectedTitle === course.title;
+                        const isActive = selectedTitle === module.title;
 
                         return (
                             <TouchableOpacity
-                                key={course.id}
+                                key={module.id}
                                 style={[styles.drawerItem, isActive && styles.activeDrawerItem]}
                                 onPress={() => {
-                                    setSelectedTitle(course.title)
+                                    setSelectedTitle(module.title)
                                     props.navigation.closeDrawer();
                                 }}>
                                 <Text
-                                    style={[styles.drawerText, isActive && styles.activeDrawerText]}> {course.title}</Text>
+                                    style={[styles.drawerText, isActive && styles.activeDrawerText]}> {module.title}</Text>
                             </TouchableOpacity>
                         )
 
