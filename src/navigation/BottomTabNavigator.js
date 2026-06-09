@@ -6,10 +6,14 @@ import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
 import {Image, TouchableOpacity} from "react-native";
 import HomeStackScreen from "./HomeStackNavigator";
+import {DrawerActions, useNavigation} from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabNavigator({navigation}) {
+export default function BottomTabNavigator() {
+
+    const navigation = useNavigation()
+
     return (
         <Tab.Navigator
             initialRouteName="Home"
@@ -36,7 +40,9 @@ export default function BottomTabNavigator({navigation}) {
                     />
                 ),
                 headerRight: () => (
-                    <TouchableOpacity onPress={() => navigation.openDrawer()} style={{marginRight: 15}}>
+                    //open the drawer from clicking on menu button
+                    <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                                      style={{marginRight: 15}}>
                         <Ionicons name="menu" size={30} color={colors.textCard}/>
                     </TouchableOpacity>
                 ),
