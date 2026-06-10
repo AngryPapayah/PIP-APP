@@ -23,12 +23,28 @@ export default function XPBar() {
         }
     }, [user]);
 
+    useEffect(() => {
+        const progressValue = Math.min(xp / XP_PER_LEVEL, 1);
+
+        Animated.timing(progressAnim, {
+            toValue: progressValue,
+            duration: 600,
+            useNativeDriver: false,
+        }).start();
+    }, [xp]);
+
     const fetchUserProgress = async () => {
         try {
-            const data = await fetchAPI(`users/${user.id}/progress`, 'GET');
+            const data = await fetchAPI(
+                `users/${user.id}/progress`,
+                'GET'
+            );
+
             if (data) {
                 setXP(data.xp || 0);
-                setCurrentLevel(Math.min(data.level || 1, MAX_LEVEL));
+                setCurrentLevel(
+                    Math.min(data.level || 1, MAX_LEVEL)
+                );
             }
         } catch (error) {
             console.error('Error fetching progress:', error);
@@ -36,26 +52,6 @@ export default function XPBar() {
             setLoading(false);
         }
     };
-
-    const updateProgress = async (newXP, newLevel) => {
-        try {
-            await fetchAPI(`users/${user.id}/progress`, 'PUT', {
-                xp: newXP,
-                level: newLevel
-            });
-        } catch (error) {
-            console.error('Error updating progress:', error);
-        }
-    };
-
-    useEffect(() => {
-        const progressValue = xp / XP_PER_LEVEL;
-        Animated.timing(progressAnim, {
-            toValue: progressValue,
-            duration: 600,
-            useNativeDriver: false,
-        }).start();
-    }, [xp]);
 
     const barWidth = screenWidth - 80;
     const animatedWidth = progressAnim.interpolate({
@@ -71,78 +67,149 @@ export default function XPBar() {
         return '#A6AA2C';
     };
 
-    const xpToNextLevel = XP_PER_LEVEL - xp;
-    const progressPercentage = Math.round((xp / XP_PER_LEVEL) * 100);
+    const xpToNextLevel = Math.max(
+        XP_PER_LEVEL - xp,
+        0
+    );
+
+    const progressPercentage = Math.min(
+        Math.round((xp / XP_PER_LEVEL) * 100),
+        100
+    );
 
     if (loading || !user) {
         return (
             <View style={styles.container}>
-                <Text style={styles.loadingText}>Loading...</Text>
+                <Text style={styles.loadingText}>
+                    Loading...
+                </Text>
             </View>
         );
     }
 
     return (
         <>
-            <TouchableOpacity onPress={() => setShowModal(true)} activeOpacity={0.7}>
+            <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setShowModal(true)}
+            >
                 <View style={styles.container}>
                     <View style={styles.levelBadge}>
-                        <Text style={styles.levelBadgeText}>LEVEL {currentLevel}</Text>
+                        <Text style={styles.levelBadgeText}>
+                            LEVEL {currentLevel}
+                        </Text>
                     </View>
 
                     <View style={styles.barWrapper}>
-                        <View style={[styles.track, { width: barWidth }]}>
+                        <View
+                            style={[
+                                styles.track,
+                                { width: barWidth },
+                            ]}
+                        >
                             <Animated.View
                                 style={[
                                     styles.filledTrack,
                                     {
                                         width: animatedWidth,
-                                        backgroundColor: getBarColor()
-                                    }
+                                        backgroundColor:
+                                            getBarColor(),
+                                    },
                                 ]}
                             />
                         </View>
                     </View>
 
                     <View style={styles.footer}>
-                        <Text style={styles.xpText}>{xp}/{XP_PER_LEVEL} XP</Text>
-                        <Text style={styles.progressText}>{progressPercentage}%</Text>
+                        <Text style={styles.xpText}>
+                            {xp}/{XP_PER_LEVEL} XP
+                        </Text>
+
+                        <Text style={styles.progressText}>
+                            {progressPercentage}%
+                        </Text>
                     </View>
                 </View>
             </TouchableOpacity>
 
             <Modal
                 visible={showModal}
-                transparent={true}
+                transparent
                 animationType="fade"
-                onRequestClose={() => setShowModal(false)}
+                onRequestClose={() =>
+                    setShowModal(false)
+                }
             >
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.primary || '#FFDFAD' }]}>
-                        <Text style={styles.modalTitle}>Your Progress</Text>
+                    <View
+                        style={[
+                            styles.modalContent,
+                            {
+                                backgroundColor:
+                                    colors.primary ||
+                                    '#FFDFAD',
+                            },
+                        ]}
+                    >
+                        <Text style={styles.modalTitle}>
+                            Your Progress
+                        </Text>
 
                         <View style={styles.levelContainer}>
-                            <Text style={styles.levelLabel}>Current Level</Text>
-                            <Text style={styles.levelValue}>{currentLevel} / {MAX_LEVEL}</Text>
+                            <Text style={styles.levelLabel}>
+                                Current Level
+                            </Text>
+
+                            <Text style={styles.levelValue}>
+                                {currentLevel} / {MAX_LEVEL}
+                            </Text>
                         </View>
 
                         <View style={styles.statsContainer}>
                             <View style={styles.statRow}>
-                                <Text style={styles.statLabel}>Current XP:</Text>
-                                <Text style={styles.statValue}>{xp} XP</Text>
+                                <Text style={styles.statLabel}>
+                                    Current XP:
+                                </Text>
+
+                                <Text style={styles.statValue}>
+                                    {xp} XP
+                                </Text>
                             </View>
+
                             <View style={styles.statRow}>
-                                <Text style={styles.statLabel}>Next level in:</Text>
-                                <Text style={styles.statValue}>{xpToNextLevel} XP</Text>
+                                <Text style={styles.statLabel}>
+                                    Next level in:
+                                </Text>
+
+                                <Text style={styles.statValue}>
+                                    {xpToNextLevel} XP
+                                </Text>
                             </View>
+
                             <View style={styles.statRow}>
-                                <Text style={styles.statLabel}>Completion:</Text>
-                                <Text style={styles.statValue}>{progressPercentage}%</Text>
+                                <Text style={styles.statLabel}>
+                                    Completion:
+                                </Text>
+
+                                <Text style={styles.statValue}>
+                                    {progressPercentage}%
+                                </Text>
                             </View>
                         </View>
 
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setShowModal(false)}>
-                            <Text style={styles.closeButtonText}>Close</Text>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() =>
+                                setShowModal(false)
+                            }
+                        >
+                            <Text
+                                style={
+                                    styles.closeButtonText
+                                }
+                            >
+                                Close
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
