@@ -85,7 +85,7 @@ export default function MultipleChoice({question, attemptId, onNext, isLastQuest
                     <View>
                         <CustomButton
                             variant="primary"
-                            size="md"
+                            size="sm"
                             onPress={() => onNext(isCorrectAnswer)}>
                             {isLastQuestion ? "Finish" : "Next question >>>"}
                         </CustomButton>
@@ -108,7 +108,7 @@ export default function MultipleChoice({question, attemptId, onNext, isLastQuest
             <View style={styles.answersContainer}>
                 {question?.answers?.map((answer) => {
 
-                    let currentVariant = "primary"
+                    let currentVariant = "questionButton"
 
                     // changing colors based on given answer
                     if (hasAnswered) {
@@ -123,7 +123,7 @@ export default function MultipleChoice({question, attemptId, onNext, isLastQuest
                         <CustomButton
                             key={answer.id}
                             variant={currentVariant}
-                            size="lg"
+                            size="sm"
                             onPress={() => handleAnswer(answer)}
                         >{answer.answer_text}</CustomButton>
                     )
@@ -154,5 +154,5 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         textAlign: "center",
-    },
+    }
 });

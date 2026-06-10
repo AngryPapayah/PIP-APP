@@ -21,16 +21,16 @@ export const globalStyles = StyleSheet.create({
 });
 
 export const colors = {
-    primary: '#FFDFAD',
-    secondary: '#C37E69',
-    navbar: '#9E6655',
+    primary: '#F4E1C1',
+    secondary: '#FFFFFF',
+    navbar: '#6D4C41',
     accent: '#784F4E',
-    textMain: '#000000',
+    textMain: '#1A1A1A',
     textCard: '#FFFFFF',
 
-    primaryButton: '#F09D67',
-    rightButton: '#06D6A0',
-    wrongButton: '#EF476F',
+    primaryButton: '#D97706',
+    rightButton: '#05b689',
+    wrongButton: '#da4063',
 
     //xp-bar
     xpBarFiller: '#676848',
@@ -38,8 +38,8 @@ export const colors = {
     xpBarIndicator: '#A6AA2C',
 
     //progress bar
-    progressBarFiller: '#909160',
-    progressBarBackground: '#E2C495',
+    progressBarFiller: '#6e7318',
+    progressBarBackground: '#edc560',
     progressBarActive: '#909160',
     progressBarInactive: '#E2C495',
 
