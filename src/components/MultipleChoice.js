@@ -5,7 +5,7 @@ import React, {useEffect, useState} from "react";
 import TextBubble from "./TextBubble";
 import {fetchAPI} from "../services/Fetch";
 
-export default function MultipleChoice({question, attemptId, onNext}) {
+export default function MultipleChoice({question, attemptId, onNext, isLastQuestion}) {
 
     const [selectedAnswerId, setSelectedAnswerId] = useState(null)
     const [hasAnswered, setHasAnswered] = useState(false)
@@ -87,7 +87,7 @@ export default function MultipleChoice({question, attemptId, onNext}) {
                             variant="primary"
                             size="md"
                             onPress={onNext}>
-                            Next question >>>
+                            {isLastQuestion ? "Finish" : "Next question >>>"}
                         </CustomButton>
                     </View>
                 </View>

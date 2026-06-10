@@ -4,6 +4,7 @@ import ModulesList from "../screens/courses/modules/ModulesList";
 import HomeScreen from "../screens/HomeScreen";
 import LessonsList from "../screens/courses/modules/lessons/LessonsList";
 import QuestionsScreen from "../screens/QuestionsScreen";
+import ResultScreen from "../screens/ResultScreen";
 
 const HomeStack = createStackNavigator();
 
@@ -15,6 +16,7 @@ export default function HomeStackScreen() {
             <HomeStack.Screen name="Modules" component={ModulesList}/>
             <HomeStack.Screen name="Lessons" component={LessonsList}/>
             <HomeStack.Screen name="Questions" component={QuestionsScreen} options={{gestureEnabled: false}}/>
+            <HomeStack.Screen name="ResultScreen" component={ResultScreen} options={{gestureEnabled: false}}/>
         </HomeStack.Navigator>
     );
 }

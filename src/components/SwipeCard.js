@@ -8,7 +8,7 @@ import {fetchAPI} from "../services/Fetch";
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 
-export default function SwipeCard({question, attemptId, onNext}) {
+export default function SwipeCard({question, attemptId, onNext, isLastQuestion}) {
     const [hasAnswered, setHasAnswered] = useState(false);
     const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
 
@@ -112,7 +112,7 @@ export default function SwipeCard({question, attemptId, onNext}) {
                 <View style={styles.feedbackContainer}>
                     <View style={styles.nextButtonWrapper}>
                         <CustomButton variant="primary" size="md" onPress={onNext}>
-                            Next question >>>
+                            {isLastQuestion ? "Finish" : "Next question >>>"}
                         </CustomButton>
                     </View>
                 </View>
