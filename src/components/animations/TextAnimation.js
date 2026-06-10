@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {Text} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {Text, ScrollView} from 'react-native';
 
 const Typewriter = ({text, speed = 80, style, onAnimationComplete}) => {
     const [displayText, setDisplayText] = useState('');
+    const scrollRef = useRef(null);
 
     useEffect(() => {
         let i = 0;
@@ -25,7 +26,16 @@ const Typewriter = ({text, speed = 80, style, onAnimationComplete}) => {
         return () => clearInterval(typing);
     }, [text, speed, onAnimationComplete]);
 
-    return <Text style={style}>{displayText}</Text>;
+    return (
+        <ScrollView
+            ref={scrollRef}
+            // keep the newest typed line in view while typing
+            onContentSizeChange={() => scrollRef.current?.scrollToEnd({animated: false})}
+            showsVerticalScrollIndicator={false}
+        >
+            <Text style={style}>{displayText}</Text>
+        </ScrollView>
+    );
 };
 
 export default Typewriter;
