@@ -12,7 +12,7 @@ export default function QuestionsScreen() {
 
     const route = useRoute();
     const navigation = useNavigation();
-    const { user } = useAuth(); // Get user from AuthContext
+    const {user} = useAuth(); // Get user from AuthContext
     const {moduleId, lessonId} = route.params;
 
     const [questions, setQuestions] = useState([]);
@@ -35,8 +35,13 @@ export default function QuestionsScreen() {
         setLoading(true)
         try {
 
+            let currentAttemptId = attemptId;
+
             //start the lesson and save the attempt id
-            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', {userId: userId})
+            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', {
+                userId: userId
+            })
+            console.log("START DATA:", JSON.stringify(startData, null, 2));
 
             if (startData && startData.error) {
                 console.error("API Error:", startData.error);
@@ -44,7 +49,9 @@ export default function QuestionsScreen() {
                 return;
             }
 
-            setAttemptId(startData.id)
+            currentAttemptId = startData.attemptId
+            setAttemptId(currentAttemptId)
+            console.log("Nieuw Attempt ID aangemaakt door backend:", startData.attemptId);
 
             //get the questions from the lesson
             const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
@@ -99,13 +106,13 @@ export default function QuestionsScreen() {
                 console.error("Er is een fout opgetreden bij het voltooien van de les:", error);
             } finally {
                 // Always navigate to the result screen.
-                navigation.navigate("ResultScreen");
+                navigation.navigate("ResultScreen", {attemptId: attemptId, lessonId: lessonId});
             }
         } else {
             setCurrentIndex(currentIndex + 1);
         }
     }
-    
+
     // Show a message if the user is not logged in
     if (!userId) {
         return (
@@ -116,7 +123,7 @@ export default function QuestionsScreen() {
     }
 
     //temporary loading screen
-    if (loading) {
+    if (loading || !attemptId) {
         return (
             <SafeAreaView style={styles.container}>
                 <Text>Questions are loading...</Text>
@@ -144,9 +151,11 @@ export default function QuestionsScreen() {
 
             {/*rendering component based on question type*/}
             {currentQuestion?.question_type === "multiple_choice" ? (
-                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={isLastQuestion}></MultipleChoice>
+                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}
+                                isLastQuestion={isLastQuestion}></MultipleChoice>
             ) : (
-                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={isLastQuestion}></SwipeCard>
+                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}
+                           isLastQuestion={isLastQuestion}></SwipeCard>
             )}
         </SafeAreaView>
     )
