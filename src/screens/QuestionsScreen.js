@@ -12,13 +12,14 @@ export default function QuestionsScreen() {
 
     const route = useRoute();
     const navigation = useNavigation();
-    const { user } = useAuth(); // Get user from AuthContext
+    const {user} = useAuth(); // Get user from AuthContext
     const {moduleId, lessonId} = route.params;
 
     const [questions, setQuestions] = useState([]);
     const [attemptId, setAttemptId] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [loading, setLoading] = useState(true)
+    const [score, setScore] = useState(0); // State to track score
 
     // Use the user's ID from the context
     const userId = user?.id;
@@ -88,7 +89,11 @@ export default function QuestionsScreen() {
     }
 
     //to navigate to the next question or end the lesson
-    async function handleNext() {
+    async function handleNext(isCorrect) {
+        if (isCorrect) {
+            setScore(prevScore => prevScore + 10); // Add 10 points for a correct answer
+        }
+
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
@@ -99,13 +104,13 @@ export default function QuestionsScreen() {
                 console.error("Er is een fout opgetreden bij het voltooien van de les:", error);
             } finally {
                 // Always navigate to the result screen.
-                navigation.navigate("ResultScreen");
+                navigation.navigate("ResultScreen", {score: score + (isCorrect ? 10 : 0)});
             }
         } else {
             setCurrentIndex(currentIndex + 1);
         }
     }
-    
+
     // Show a message if the user is not logged in
     if (!userId) {
         return (
@@ -144,9 +149,11 @@ export default function QuestionsScreen() {
 
             {/*rendering component based on question type*/}
             {currentQuestion?.question_type === "multiple_choice" ? (
-                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={isLastQuestion}></MultipleChoice>
+                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}
+                                isLastQuestion={isLastQuestion}></MultipleChoice>
             ) : (
-                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={isLastQuestion}></SwipeCard>
+                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}
+                           isLastQuestion={isLastQuestion}></SwipeCard>
             )}
         </SafeAreaView>
     )
