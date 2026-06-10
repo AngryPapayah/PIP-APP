@@ -65,11 +65,13 @@ export default function BottomTabNavigator() {
                 options={({route}) => {
                     const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeScreen';
                     const isQuestionsScreen = routeName === 'Questions';
+                    const isResultScreen = routeName === 'ResultScreen';
+                    const hideHeaderAndTab = isQuestionsScreen || isResultScreen;
 
                     return {
-                        headerShown: !isQuestionsScreen,
+                        headerShown: !hideHeaderAndTab,
                         tabBarStyle: {
-                            display: isQuestionsScreen ? 'none' : 'flex',
+                            display: hideHeaderAndTab ? 'none' : 'flex',
                             backgroundColor: colors.navbar,
                         },
                         tabBarIcon: ({color, size}) => (
