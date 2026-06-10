@@ -13,12 +13,12 @@ export default function HamsterverseScreen() {
         setLevel(data.level);
     };
 
-    const increaseXP = () => {
-        const newXP = xp + 50;
-        setXP(newXP);
-        const newLevel = Math.floor(newXP / 100) + 1;
-        setLevel(newLevel);
-    }
+    // const increaseXP = () => {
+    //     const newXP = xp + 50;
+    //     setXP(newXP);
+    //     const newLevel = Math.floor(newXP / 100) + 1;
+    //     setLevel(newLevel);
+    // }
 
     // Bouncing pip
     useEffect(() => {
