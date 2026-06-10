@@ -49,9 +49,9 @@ export default function HamsterverseScreen() {
                 />
             </View>
 
-            <TouchableOpacity style={styles.xpButton} onPress={increaseXP}>
-                <Text style={styles.xpButtonText}>+50 XP</Text>
-            </TouchableOpacity>
+            {/*<TouchableOpacity style={styles.xpButton} onPress={increaseXP}>*/}
+            {/*    <Text style={styles.xpButtonText}>+50 XP</Text>*/}
+            {/*</TouchableOpacity>*/}
 
             {/* Habitat two tone (beige top, orange bottom) */}
             <View style={styles.habitat}>
