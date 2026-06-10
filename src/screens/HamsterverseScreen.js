@@ -109,27 +109,6 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         backgroundColor: colors?.primary || '#FFDFAD',
     },
-
-    xpButton: {
-        backgroundColor: '#FF8C42',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 25,
-        alignSelf: 'center',
-        marginVertical: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    xpButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-
     habitat: {
         flex: 1,
         position: 'relative',
