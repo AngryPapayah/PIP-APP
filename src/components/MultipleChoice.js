@@ -86,7 +86,7 @@ export default function MultipleChoice({question, attemptId, onNext, isLastQuest
                         <CustomButton
                             variant="primary"
                             size="md"
-                            onPress={onNext}>
+                            onPress={() => onNext(isCorrectAnswer)}>
                             {isLastQuestion ? "Finish" : "Next question >>>"}
                         </CustomButton>
                     </View>

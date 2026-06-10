@@ -1,24 +1,69 @@
 import React from 'react';
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image} from 'react-native';
 import {colors} from "../styles/GlobalStyles";
+import {CommonActions} from '@react-navigation/native';
+import XPBar from '../components/XPBar';
+import TextBubble from '../components/TextBubble';
 
-export default function ResultScreen({navigation}) {
+export default function ResultScreen({navigation, route}) {
+    // Haal de score op uit de route params (met 0 als fallback)
+    const score = route?.params?.score || 0;
+
+    const goToHome = () => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{name: 'HomeScreen'}],
+            })
+        );
+    };
+
+    const goToHamsterverse = () => {
+        // First, reset the Home stack, then navigate to the Hamsterverse tab.
+        // A slight delay might be needed if there are race conditions, but dispatching actions sequentially is usually safe.
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{name: 'HomeScreen'}],
+            })
+        );
+        navigation.navigate('Hamsterverse');
+    };
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>RESULTSCREEN</Text>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('Hamsterverse')}
-            >
-                <Text style={styles.buttonText}>Hamsterverse</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('HomeScreen')}
-            >
-                <Text style={styles.buttonText}>Home</Text>
-            </TouchableOpacity>
-        </View>
+        <SafeAreaView style={styles.container}>
+
+            <View style={styles.content}>
+                <View style={styles.characterContainer}>
+                    {/*The tip text of the lesson*/}
+                    <TextBubble text="Good job!"/>
+                    <Image
+                        source={require('../../public/images/pip-body.png')}
+                        style={styles.characterImage}
+                    />
+                </View>
+
+                {/* Score text added between the image and the XP Bar */}
+                <Text style={styles.scoreText}>Score: {score}</Text>
+
+                <View style={styles.xpBarSection}>
+                    <XPBar/>
+                </View>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={goToHamsterverse}
+                >
+                    <Text style={styles.buttonText}>Hamsterverse</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={goToHome}
+                >
+                    <Text style={styles.buttonText}>Home</Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
     )
 }
 
@@ -26,8 +71,36 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors?.primary || '#fff',
+    },
+    content: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    characterContainer: {
+        alignItems: 'center',
+        alignSelf: 'flex-end',
+        marginRight: 20,
+        marginBottom: 20,
+    },
+    characterImage: {
+        width: 150,
+        height: 150,
+        resizeMode: 'contain',
+        marginTop: -10, // Bring the image a bit closer to the text bubble
+    },
+    scoreText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: colors?.textMain || '#000',
+        marginBottom: 20, // Add spacing before XPBar
+    },
+    xpBarSection: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: colors?.primary || '#FFDFAD',
+        width: '100%',
+        alignItems: 'center',
     },
     text: {
         fontSize: 20,
@@ -46,7 +119,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
-        color: '#fff',
+        color: colors.textMain || '#000000',
         fontSize: 18,
         fontWeight: 'bold',
     }

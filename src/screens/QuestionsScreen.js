@@ -19,6 +19,7 @@ export default function QuestionsScreen() {
     const [attemptId, setAttemptId] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [loading, setLoading] = useState(true)
+    const [score, setScore] = useState(0); // State to track score
 
     // Use the user's ID from the context
     const userId = user?.id;
@@ -95,7 +96,11 @@ export default function QuestionsScreen() {
     }
 
     //to navigate to the next question or end the lesson
-    async function handleNext() {
+    async function handleNext(isCorrect) {
+        if (isCorrect) {
+            setScore(prevScore => prevScore + 10); // Add 10 points for a correct answer
+        }
+
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
@@ -107,6 +112,7 @@ export default function QuestionsScreen() {
             } finally {
                 // Always navigate to the result screen.
                 navigation.navigate("ResultScreen", {attemptId: attemptId, lessonId: lessonId});
+                navigation.navigate("ResultScreen", {score: score + (isCorrect ? 10 : 0)});
             }
         } else {
             setCurrentIndex(currentIndex + 1);

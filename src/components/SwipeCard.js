@@ -111,7 +111,7 @@ export default function SwipeCard({question, attemptId, onNext, isLastQuestion})
             {hasAnswered ? (
                 <View style={styles.feedbackContainer}>
                     <View style={styles.nextButtonWrapper}>
-                        <CustomButton variant="primary" size="md" onPress={onNext}>
+                        <CustomButton variant="primary" size="md" onPress={() => onNext(isCorrectAnswer)}>
                             {isLastQuestion ? "Finish" : "Next question >>>"}
                         </CustomButton>
                     </View>
