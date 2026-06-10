@@ -1,20 +1,42 @@
 import React from 'react';
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {colors} from "../styles/GlobalStyles";
+import { CommonActions } from '@react-navigation/native';
 
 export default function ResultScreen({navigation}) {
+    const goToHome = () => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'HomeScreen' }],
+            })
+        );
+    };
+
+    const goToHamsterverse = () => {
+        // First, reset the Home stack, then navigate to the Hamsterverse tab.
+        // A slight delay might be needed if there are race conditions, but dispatching actions sequentially is usually safe.
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'HomeScreen' }],
+            })
+        );
+        navigation.navigate('Hamsterverse');
+    };
+    
     return (
         <View style={styles.container}>
             <Text style={styles.text}>RESULTSCREEN</Text>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('Hamsterverse')}
+                onPress={goToHamsterverse}
             >
                 <Text style={styles.buttonText}>Hamsterverse</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('HomeScreen')}
+                onPress={goToHome}
             >
                 <Text style={styles.buttonText}>Home</Text>
             </TouchableOpacity>
