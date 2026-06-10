@@ -21,8 +21,18 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
         const data = await res.json();
 
         if (res.status === 401) {
-            // Navigatie afhandelen via je nav ref of een auth context
-            return {error: 'Unauthorized', status: 401};
+            // Check if the backend provided a specific error message, otherwise fallback to "Unauthorized"
+            return {
+                error: data.message || data.error || 'Unauthorized', 
+                status: 401
+            };
+        }
+
+        if (!res.ok) {
+            return {
+                error: data.message || data.error || `Error ${res.status}`,
+                status: res.status
+            };
         }
 
         return data;

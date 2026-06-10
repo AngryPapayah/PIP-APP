@@ -13,7 +13,8 @@ import {
 import {SafeAreaView} from "react-native-safe-area-context";
 import {globalStyles, colors} from "../styles/GlobalStyles";
 import TextBubble from "../components/TextBubble";
-import {fetchAPI} from "../services/Fetch"
+import {fetchAPI} from "../services/Fetch";
+import {useAuth} from "../contexts/AuthContext";
 
 const conversation = [
     "Welcome to P.I.P.",
@@ -22,6 +23,7 @@ const conversation = [
 ];
 
 export default function LoginScreen({navigation}) {
+    const { login } = useAuth();
     // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -55,9 +57,9 @@ export default function LoginScreen({navigation}) {
             if (data.error) {
                 setErrorMessage(data.error);
             } else {
-                // Handle successful login, e.g., store token and navigate
+                // Store user data in context
                 console.log('Login successful:', data);
-                navigation.navigate('Main');
+                login(data.data.user); // Store user data.
             }
         } catch (error) {
             setErrorMessage('An unexpected error occurred. Please try again.');

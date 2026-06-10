@@ -6,11 +6,13 @@ import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
 import ProgressBar from "../components/ProgressBar";
+import {useAuth} from "../contexts/AuthContext";
 
 export default function QuestionsScreen() {
 
     const route = useRoute();
     const navigation = useNavigation();
+    const { user } = useAuth(); // Get user from AuthContext
     const {moduleId, lessonId} = route.params;
 
     const [questions, setQuestions] = useState([]);
@@ -18,13 +20,16 @@ export default function QuestionsScreen() {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [loading, setLoading] = useState(true)
 
-    //temporary user id
-    const userId = 1;
+    // Use the user's ID from the context
+    const userId = user?.id;
 
 
     useEffect(() => {
-        getQuestions()
-    }, [moduleId, lessonId])
+        // Make sure we have a userId before fetching questions
+        if (userId) {
+            getQuestions()
+        }
+    }, [moduleId, lessonId, userId])
 
     async function getQuestions() {
         setLoading(true)
@@ -84,28 +89,30 @@ export default function QuestionsScreen() {
 
     //to navigate to the next question or end the lesson
     async function handleNext() {
-        setLoading(true)
-        if (currentIndex < questions.length - 1) {
-            setCurrentIndex(currentIndex + 1)
-            setLoading(false)
-        } else {
+        const isLast = currentIndex >= questions.length - 1;
+
+        if (isLast) {
             try {
-                //complete the lesson
-                const completeData = await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', {userId: userId})
-
-                if (completeData && completeData.error) {
-                    console.error("API Error:", completeData.error);
-                    setLoading(false);
-                    return;
-                }
-
-                navigation.navigate("Modules")
-                setLoading(false)
-
+                // Attempt to complete the lesson, but don't let it block navigation.
+                await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', {userId: userId});
             } catch (error) {
-                console.error("Er is een fout opgetreden", error);
+                console.error("Er is een fout opgetreden bij het voltooien van de les:", error);
+            } finally {
+                // Always navigate to the result screen.
+                navigation.navigate("ResultScreen");
             }
+        } else {
+            setCurrentIndex(currentIndex + 1);
         }
+    }
+    
+    // Show a message if the user is not logged in
+    if (!userId) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Text>Please log in to view questions.</Text>
+            </SafeAreaView>
+        )
     }
 
     //temporary loading screen
@@ -128,6 +135,7 @@ export default function QuestionsScreen() {
 
     //select active question based on the current index
     const currentQuestion = questions[currentIndex];
+    const isLastQuestion = currentIndex === questions.length - 1;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -136,9 +144,9 @@ export default function QuestionsScreen() {
 
             {/*rendering component based on question type*/}
             {currentQuestion?.question_type === "multiple_choice" ? (
-                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}></MultipleChoice>
+                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={isLastQuestion}></MultipleChoice>
             ) : (
-                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}></SwipeCard>
+                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={isLastQuestion}></SwipeCard>
             )}
         </SafeAreaView>
     )

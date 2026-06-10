@@ -2,13 +2,13 @@ import React from 'react';
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {colors} from "../styles/GlobalStyles";
 
-export default function ResultScreen({ navigation }) {
+export default function ResultScreen({navigation}) {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>RESULTSCREEN</Text>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('HamsterverseScreen')}
+                onPress={() => navigation.navigate('Hamsterverse')}
             >
                 <Text style={styles.buttonText}>Hamsterverse</Text>
             </TouchableOpacity>
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
         marginVertical: 20,
-        color: '#fff'
+        color: colors.textMain || '#000000',
     },
     button: {
         backgroundColor: colors.secondary,
