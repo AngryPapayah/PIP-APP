@@ -2,7 +2,7 @@ import {StyleSheet, View} from "react-native";
 import {Card} from "../../../components/Card";
 import {useNavigation} from "@react-navigation/native";
 
-export default function ModulesListItem({module, courseId}) {
+export default function ModulesListItem({module}) {
 
     const navigation = useNavigation()
 
@@ -10,7 +10,10 @@ export default function ModulesListItem({module, courseId}) {
         <View style={styles.container}>
             <Card iconName="eye" lessonTitle={module.title} description={module.description}
                   buttonText={"Show Lessons"}
-                  onPress={() => navigation.navigate("Lessons", {courseId, moduleId: module.id})}></Card>
+                  onPress={() => navigation.navigate("Lessons", {
+                      moduleId: module.id,
+                      moduleTitle: module.title
+                  })}></Card>
         </View>
     )
 }
