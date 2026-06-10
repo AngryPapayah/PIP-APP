@@ -3,7 +3,7 @@ import {CustomButton} from "./CustomButton";
 import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../styles/GlobalStyles";
 
-export const Card = ({iconName, lessonTitle, description, difficulty, buttonText, estimated_time, onPress}) => {
+export const Card = ({iconName, lessonTitle, description, buttonText, estimated_time, onPress}) => {
 
     const isLocked = iconName === 'lock-closed';
     const isFinished = iconName === 'checkmark-circle';
@@ -13,7 +13,6 @@ export const Card = ({iconName, lessonTitle, description, difficulty, buttonText
                    style={[styles.container, isLocked && styles.lockedCard, isFinished]}>
             <Text style={styles.titleText}>{lessonTitle}</Text>
             <Ionicons name={iconName} size={100} color={isFinished ? '#464712' : '#000'}></Ionicons>
-            <Text>{difficulty}</Text>
             <Text>{estimated_time}</Text>
             <Text style={styles.descriptionText} numberOfLines={5}>{description}</Text>
             <CustomButton variant="primary" size="md" disabled={isLocked} onPress={onPress}

@@ -10,20 +10,20 @@ export default function LessonsList() {
 
     const route = useRoute();
     const navigation = useNavigation();
-    const {courseId, moduleId} = route.params;
-    
+    const {moduleId, moduleTitle} = route.params;
+
     const [lessons, setLessons] = useState([]);
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         getLessons()
-    }, [courseId, moduleId])
+    }, [moduleId])
 
     async function getLessons() {
         setLoading(true)
         try {
 
-            const data = await fetchAPI(`courses/${courseId}/modules/${moduleId}/lessons`, 'GET')
+            const data = await fetchAPI(`courses/1/modules/${moduleId}/lessons`, 'GET')
 
             if (data && data.error) {
                 console.error("API Error:", data.error);
@@ -56,7 +56,7 @@ export default function LessonsList() {
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"}></Ionicons>
                 </TouchableOpacity>
-                <Text style={styles.text}>Your lessons from module {lessons[0]?.module_title}</Text>
+                <Text style={styles.text}>Your lessons from module {moduleTitle}</Text>
             </View>
             <FlatList
                 data={lessons}
@@ -65,7 +65,7 @@ export default function LessonsList() {
                 //gives styling to the content of the list
                 renderItem={({item}) =>
                     (<View style={styles.itemWrapper}>
-                        <LessonsListItem lesson={item} courseId={courseId} moduleId={moduleId}/>
+                        <LessonsListItem lesson={item} moduleId={moduleId}/>
                     </View>)
 
                 }

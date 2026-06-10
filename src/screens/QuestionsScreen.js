@@ -1,8 +1,7 @@
 import MultipleChoice from "../components/MultipleChoice";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {StyleSheet, Text, View} from "react-native";
-import {SafeAreaView} from "react-native-safe-area-context";
+import {SafeAreaView, StyleSheet, Text} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
@@ -13,8 +12,8 @@ export default function QuestionsScreen() {
 
     const route = useRoute();
     const navigation = useNavigation();
-    const {courseId, moduleId, lessonId} = route.params;
     const { user } = useAuth(); // Get user from AuthContext
+    const {moduleId, lessonId} = route.params;
 
     const [questions, setQuestions] = useState([]);
     const [attemptId, setAttemptId] = useState(null)
@@ -30,7 +29,7 @@ export default function QuestionsScreen() {
         if (userId) {
             getQuestions()
         }
-    }, [courseId, moduleId, lessonId, userId])
+    }, [moduleId, lessonId, userId])
 
     async function getQuestions() {
         setLoading(true)
@@ -48,7 +47,7 @@ export default function QuestionsScreen() {
             setAttemptId(startData.id)
 
             //get the questions from the lesson
-            const questionData = await fetchAPI(`courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
+            const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
 
             if (questionData && questionData.error) {
                 console.error("API Error:", questionData.error);
@@ -61,7 +60,7 @@ export default function QuestionsScreen() {
             const fullQuestions = await Promise.all(
                 questionData.map(async (question) => {
 
-                    const answerData = await fetchAPI(`courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET')
+                    const answerData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET')
 
                     if (answerData && answerData.error) {
                         console.error("API Error:", answerData.error);
@@ -141,7 +140,7 @@ export default function QuestionsScreen() {
     return (
         <SafeAreaView style={styles.container}>
             {/*progress visualisation*/}
-            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length} />
+            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
 
             {/*rendering component based on question type*/}
             {currentQuestion?.question_type === "multiple_choice" ? (
