@@ -5,7 +5,10 @@ import {CommonActions} from '@react-navigation/native';
 import XPBar from '../components/XPBar';
 import TextBubble from '../components/TextBubble';
 
-export default function ResultScreen({navigation}) {
+export default function ResultScreen({navigation, route}) {
+    // Haal de score op uit de route params (met 0 als fallback)
+    const score = route?.params?.score || 0;
+
     const goToHome = () => {
         navigation.dispatch(
             CommonActions.reset({
@@ -40,6 +43,9 @@ export default function ResultScreen({navigation}) {
                     />
                 </View>
 
+                {/* Score text added between the image and the XP Bar */}
+                <Text style={styles.scoreText}>Score: {score}</Text>
+
                 <View style={styles.xpBarSection}>
                     <XPBar/>
                 </View>
@@ -73,6 +79,8 @@ const styles = StyleSheet.create({
     },
     characterContainer: {
         alignItems: 'center',
+        alignSelf: 'flex-end',
+        marginRight: 20,
         marginBottom: 20,
     },
     characterImage: {
@@ -80,6 +88,12 @@ const styles = StyleSheet.create({
         height: 150,
         resizeMode: 'contain',
         marginTop: -10, // Bring the image a bit closer to the text bubble
+    },
+    scoreText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: colors?.textMain || '#000',
+        marginBottom: 20, // Add spacing before XPBar
     },
     xpBarSection: {
         paddingHorizontal: 16,
