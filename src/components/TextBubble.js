@@ -32,6 +32,9 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 15,
         borderBottomRightRadius: 0,
+        // Fixed size: text scrolls inside
+        height: 120,
+        width: 260,
     },
     text: {
         fontSize: 25,
