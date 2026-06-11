@@ -3,13 +3,15 @@ import {Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Keybo
 import {SafeAreaView} from "react-native-safe-area-context";
 import {globalStyles, colors} from "../styles/GlobalStyles";
 import {fetchAPI} from "../services/Fetch";
+import { useLoading } from "../contexts/LoadingContext"; // <-- NIEUW: Importeer useLoading
 
 export default function SignupScreen({navigation}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false); // <-- VERWIJDERD: Lokale loading state is niet meer nodig
+    const { setLoading } = useLoading(); // <-- NIEUW: Haal setLoading op uit de context
 
     const handleSignUp = async () => {
         if (!name || !email || !password) {
@@ -22,23 +24,28 @@ export default function SignupScreen({navigation}) {
             return;
         }
 
-        setLoading(true);
-        const result = await fetchAPI('register', 'POST', {name, email, password});
-        setLoading(false);
+        setLoading(true); // <-- AANGEPAST: Activeer de globale loading modal
+        try {
+            const result = await fetchAPI('register', 'POST', {name, email, password});
 
-        if (result?.error) {
-            setErrorMessage(result.error);
-            return;
+            if (result?.error) {
+                setErrorMessage(result.error);
+                return;
+            }
+
+            setErrorMessage('');
+            Alert.alert(
+                "Registration Successful",
+                "You can now log in with your new account.",
+                [
+                    { text: "OK", onPress: () => navigation.navigate('Login') }
+                ]
+            );
+        } catch (error) {
+            setErrorMessage('An unexpected error occurred. Please try again.');
+        } finally {
+            setLoading(false); // <-- AANGEPAST: Deactiveer de globale loading modal
         }
-
-        setErrorMessage('');
-        Alert.alert(
-            "Registration Successful",
-            "You can now log in with your new account.",
-            [
-                { text: "OK", onPress: () => navigation.navigate('Login') }
-            ]
-        );
     };
 
     return (
@@ -47,7 +54,7 @@ export default function SignupScreen({navigation}) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardAvoidingView}
             >
-                <ScrollView 
+                <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
@@ -85,8 +92,9 @@ export default function SignupScreen({navigation}) {
 
                         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-                        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
-                            <Text style={styles.buttonText}>{loading ? 'Loading...' : 'Sign Up'}</Text>
+                        {/* <-- AANGEPAST: Verwijder disabled={loading} en de conditionele tekst */}
+                        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                            <Text style={styles.buttonText}>Sign Up</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

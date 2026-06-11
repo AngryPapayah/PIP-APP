@@ -10,6 +10,8 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
     }
 
     try {
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Vertraagt de respons met 2 sec
+
         const res = await fetch(`${EXPO_PUBLIC_API_URL}${endpoint}`, {
             method,
             headers,
@@ -23,7 +25,7 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
         if (res.status === 401) {
             // Check if the backend provided a specific error message, otherwise fallback to "Unauthorized"
             return {
-                error: data.message || data.error || 'Unauthorized', 
+                error: data.message || data.error || 'Unauthorized',
                 status: 401
             };
         }

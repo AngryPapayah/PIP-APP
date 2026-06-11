@@ -15,6 +15,7 @@ import {globalStyles, colors} from "../styles/GlobalStyles";
 import TextBubble from "../components/TextBubble";
 import {fetchAPI} from "../services/Fetch";
 import {useAuth} from "../contexts/AuthContext";
+import { useLoading } from "../contexts/LoadingContext"; // <-- NIEUW: Importeer useLoading
 
 const conversation = [
     "Welcome to P.I.P.",
@@ -24,11 +25,13 @@ const conversation = [
 
 export default function LoginScreen({navigation}) {
     const { login } = useAuth();
+    const { setLoading } = useLoading(); // <-- NIEUW: Haal setLoading op uit de context
+
     // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false); // <-- VERWIJDERD: Lokale loading state is niet meer nodig
 
 
     // textbubble
@@ -48,7 +51,7 @@ export default function LoginScreen({navigation}) {
             setErrorMessage('Please fill in all fields.');
             return;
         }
-        setLoading(true);
+        setLoading(true); // <-- AANGEPAST: Activeer de globale loading modal
         setErrorMessage('');
 
         try {
@@ -64,7 +67,7 @@ export default function LoginScreen({navigation}) {
         } catch (error) {
             setErrorMessage('An unexpected error occurred. Please try again.');
         } finally {
-            setLoading(false);
+            setLoading(false); // <-- AANGEPAST: Deactiveer de globale loading modal
         }
     };
 
@@ -78,7 +81,7 @@ export default function LoginScreen({navigation}) {
                 style={styles.keyboardAvoidingView}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                <ScrollView 
+                <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
@@ -112,8 +115,9 @@ export default function LoginScreen({navigation}) {
 
                     {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-                    <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-                        <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+                    {/* <-- AANGEPAST: Verwijder disabled={loading} en de conditionele tekst */}
+                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                        <Text style={styles.buttonText}>Login</Text>
                     </TouchableOpacity>
 
                     <Text style={styles.orText}> OR </Text>
