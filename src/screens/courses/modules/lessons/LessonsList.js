@@ -31,7 +31,9 @@ export default function LessonsList() {
                 return;
             }
 
-            setLessons(data);
+            const filteredLessons = data.filter(lesson => Number(lesson.module_id) === Number(moduleId));
+
+            setLessons(filteredLessons);
             setLoading(false)
 
 
