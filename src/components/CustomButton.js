@@ -19,13 +19,13 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
             <Text style={[styles.buttonText, variant === "questionButton" && {color: '#000'}]}>{children}</Text>
 
             {isRightAnswer && (
-                <View style={styles.iconContainer}>
+                <View accessible={true} style={styles.iconContainer} accessibilityLabel={"Correct awnser"}>
                     <Ionicons name="thumbs-up" size={18} color={'#047053'}></Ionicons>
                 </View>
             )}
 
             {isWrongAnswer && (
-                <View style={styles.iconContainer}>
+                <View accessible={true} style={styles.iconContainer} accessibilityLabel={"Wrong awnser"}>
                     <Ionicons name="thumbs-down" size={18} color={'#802636'}></Ionicons>
                 </View>
             )}
