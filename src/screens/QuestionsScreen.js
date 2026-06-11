@@ -97,24 +97,59 @@ export default function QuestionsScreen() {
 
     //to navigate to the next question or end the lesson
     async function handleNext(isCorrect) {
+        const newScore = score + (isCorrect ? 10 : 0);
         if (isCorrect) {
-            setScore(prevScore => prevScore + 10); // Add 10 points for a correct answer
+            setScore(newScore);
         }
 
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
             try {
-                // Attempt to complete the lesson, but don't let it block navigation.
-                await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', {userId: userId});
+                // Les afronden
+                await fetchAPI(
+                    `progress/attempts/${attemptId}/complete`,
+                    'POST',
+                    {
+                        userId: userId
+                    }
+                );
+                console.log("Lesson completed");
+
+                // XP
+                const xpResponse = await fetchAPI(
+                    'progress/xp',
+                    'POST',
+                    {
+                        userId: userId,
+                        activityType: 'quiz_completed',
+                        activityId: `lesson_${lessonId}`,
+                        xpAmount: newScore
+                    }
+                );
+                console.log("XP RESPONSE:", xpResponse);
+
+                // Controle
+                const updatedUser = await fetchAPI(
+                    `users/${userId}`,
+                    'GET'
+                );
+                console.log("UPDATED USER:", updatedUser);
+
             } catch (error) {
-                console.error("Er is een fout opgetreden bij het voltooien van de les:", error);
+                console.error(
+                    "Er is een fout opgetreden bij het voltooien van de les:",
+                    error
+                );
             } finally {
-                // Always navigate to the result screen.
-                navigation.navigate("ResultScreen", {attemptId: attemptId, lessonId: lessonId});
-                navigation.navigate("ResultScreen", {score: score + (isCorrect ? 10 : 0)});
+                navigation.navigate("ResultScreen", {
+                    score: newScore
+                });
             }
         } else {
+            if (isCorrect) {
+                setScore(newScore);
+            }
             setCurrentIndex(currentIndex + 1);
         }
     }
