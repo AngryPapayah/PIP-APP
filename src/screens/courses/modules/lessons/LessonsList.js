@@ -31,7 +31,9 @@ export default function LessonsList() {
                 return;
             }
 
-            setLessons(data);
+            const filteredLessons = data.filter(lesson => Number(lesson.module_id) === Number(moduleId));
+
+            setLessons(filteredLessons);
             setLoading(false)
 
 
@@ -95,7 +97,7 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     text: {
-        fontSize: 20,
+        fontSize: 30,
         fontWeight: "bold",
         textAlign: "center",
     },

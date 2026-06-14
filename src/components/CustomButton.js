@@ -16,7 +16,7 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
             disabled && {opacity: 0.3},
             style
         ]}>
-            <Text style={styles.buttonText}>{children}</Text>
+            <Text style={[styles.buttonText, variant === "questionButton" && {color: '#000'}]}>{children}</Text>
 
             {isRightAnswer && (
                 <View style={styles.iconContainer}>
@@ -39,6 +39,12 @@ const variants = {
         borderWidth: 1,
         borderRadius: 10,
         borderColor: colors?.accent || '#784F4E'
+    },
+    questionButton: {
+        backgroundColor: '#E2C495',
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: colors?.accent || '#784F4E',
     },
     rightAnswer: {
         backgroundColor: colors?.rightButton || '#06D6A0',
@@ -71,6 +77,8 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: globalStyles?.text.fontSize || 18,
         textAlign: 'center',
+        color: '#FFFFFF',
+        fontWeight: 'bold'
     },
     iconContainer: {
         position: 'absolute',

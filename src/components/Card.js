@@ -53,11 +53,13 @@ const styles = StyleSheet.create({
         pointerEvents: 'none',
     },
     titleText: {
-        fontSize: 20,
-        fontWeight: 'bold'
+        paddingTop: '10',
+        fontSize: 25,
+        fontWeight: 'bold',
+        textAlign: 'center'
     },
     descriptionText: {
-        fontSize: 14,
+        fontSize: 18,
         padding: 10,
     }
 })

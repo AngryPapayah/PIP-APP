@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: colors?.textCard,
-        fontSize: 18,
+        fontSize: 25,
         fontWeight: 'bold',
         marginBottom: 20
     },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     },
     drawerText: {
         color: colors?.textCard,
-        fontSize: 16
+        fontSize: 20
     },
 
     activeDrawerItem: {
