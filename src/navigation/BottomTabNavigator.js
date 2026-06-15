@@ -22,8 +22,8 @@ export default function BottomTabNavigator() {
                 tabBarStyle: {
                     backgroundColor: colors.navbar,
                 },
-                tabBarActiveTintColor: colors.textCard,
-                tabBarInactiveTintColor: colors.textMain,
+                tabBarActiveTintColor: '#feead2',
+                tabBarInactiveTintColor: '#feead2',
                 headerStyle: {
                     backgroundColor: colors.navbar,
                 },

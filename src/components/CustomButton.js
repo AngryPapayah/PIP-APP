@@ -16,7 +16,12 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
             disabled && {opacity: 0.3},
             style
         ]}>
-            <Text style={[styles.buttonText, variant === "questionButton" && {color: '#000'}]}>{children}</Text>
+            <Text style={[
+                styles.buttonText,
+                variant === "questionButton" && {color: '#000'},
+                isRightAnswer && {color: '#0700db'},
+                isWrongAnswer && {color: '#000f01'}
+            ]}>{children}</Text>
 
             {isRightAnswer && (
                 <View accessible={true} style={styles.iconContainer} accessibilityLabel={"Correct awnser"}>
