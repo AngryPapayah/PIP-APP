@@ -22,7 +22,7 @@ export default function BottomTabNavigator() {
                 tabBarStyle: {
                     backgroundColor: colors.navbar,
                 },
-                tabBarActiveTintColor: '#feead2',
+                tabBarActiveTintColor: '#fcf8f2',
                 tabBarInactiveTintColor: '#feead2',
                 headerStyle: {
                     backgroundColor: colors.navbar,
