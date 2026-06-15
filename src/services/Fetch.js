@@ -10,7 +10,11 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
     }
 
     try {
-        const res = await fetch(`${EXPO_PUBLIC_API_URL}${endpoint}`, {
+        const baseUrl = EXPO_PUBLIC_API_URL.endsWith('/') ? EXPO_PUBLIC_API_URL : `${EXPO_PUBLIC_API_URL}/`;
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+        const url = `${baseUrl}${cleanEndpoint}`;
+
+        const res = await fetch(url, {
             method,
             headers,
             body: body ? JSON.stringify(body) : null
