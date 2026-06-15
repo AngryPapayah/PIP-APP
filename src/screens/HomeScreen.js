@@ -6,6 +6,7 @@ import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
 import {useNavigation} from "@react-navigation/native";
 import {useAuth} from "../contexts/AuthContext";
 
+//onboarding
 const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
 ))
@@ -15,19 +16,20 @@ export default function HomeScreen() {
     const navigation = useNavigation()
     const {user} = useAuth()
 
+    //onboarding
     const {start, copilotEvents} = useCopilot()
-
     const [isLayoutReady, setIsLayoutReady] = useState(false);
 
+    //onboarding
     useEffect(() => {
-        console.log("Check: Is user ingelogd?", user);
-        console.log("Check: Onboarding status van user:", user?.on_boarding);
-        console.log("Check: startTour vlag aanwezig?", user?.startTour);
+        // console.log("Check: Is user ingelogd?", user);
+        // console.log("Check: Onboarding status van user:", user?.on_boarding);
+        // console.log("Check: startTour vlag aanwezig?", user?.startTour);
 
-        if (isLayoutReady && (user?.on_boarding === 0 || user?.startTour)) {
+        if (isLayoutReady && (user?.on_boarding === 0 || user?.startTour === true)) {
 
             const timer = setTimeout(() => {
-                console.log("LOG: Executing start() NU!");
+                // console.log("LOG: Executing start() NU!");
                 start()
             }, 600)
 
@@ -37,14 +39,15 @@ export default function HomeScreen() {
         }
     }, [isLayoutReady, user]);
 
+    //onboarding
     useEffect(() => {
 
         copilotEvents.on('start', () => {
-            console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
+            // console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
         });
 
         copilotEvents.on('stop', () => {
-            console.log("Tour op homescreen klaar, naar hamburgermenu")
+            // console.log("Tour op homescreen klaar, naar hamburgermenu")
             navigation.navigate('Profile', {startTour: true})
         })
 
@@ -58,14 +61,14 @@ export default function HomeScreen() {
     return (
         <View style={styles.container} onLayout={() => setIsLayoutReady(true)}>
             <CopilotStep name="WelcomeText" order={1}
-                         text="Welcome to your dashboard. Here you see an overview of what you can learn.">
+                         text="Welcome to your dashboard. Here you have an overview of the modules which you can learn from with different digital categories.">
                 <CopilotView>
                     <Text style={styles.text}>Your Modules</Text>
                 </CopilotView>
             </CopilotStep>
 
             <CopilotStep name="ModulesList" order={2}
-                         text="These are your learningmodules. Click on a module to start learning.">
+                         text="These are your learningmodules. Press on a module to pick out a lesson to strengthen your digital knowledge.">
                 <CopilotView>
                     <ModulesList></ModulesList>
                 </CopilotView>

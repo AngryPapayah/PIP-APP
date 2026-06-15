@@ -12,12 +12,15 @@ const labelMap = {
     Digital_skill_level: 'Digital skill level',
 };
 
+//onboarding
 const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
 ));
 
 export default function ProfileScreen() {
     const {logout, user} = useAuth();
+
+    //onboarding
     const navigation = useNavigation()
     const route = useRoute()
 
@@ -35,7 +38,7 @@ export default function ProfileScreen() {
         const starting = route?.params?.startTour
 
         if (isLayoutReady && starting) {
-            console.log("LOG: Profile layout klaar. Start profiel-tour!");
+            // console.log("LOG: Profile layout klaar. Start profiel-tour!");
             const timer = setTimeout(() => {
                 start("ProfileText");
             }, 600);
@@ -48,11 +51,11 @@ export default function ProfileScreen() {
     useEffect(() => {
 
         copilotEvents.on('start', () => {
-            console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
+            // console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
         });
 
         copilotEvents.on('stop', () => {
-            console.log("Tour op profile klaar, naar hamsterverse")
+            // console.log("Tour op profile klaar, naar hamsterverse")
             navigation.navigate('Hamsterverse', {startTour: true})
         })
 
@@ -77,14 +80,14 @@ export default function ProfileScreen() {
     return (
         <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
             <CopilotStep name="ProfileText" order={3}
-                         text="Welcome to your profile. Here you see your profile information.">
+                         text="This is your profile page. Here you can find your profile and personal information.">
                 <CopilotView>
                     <Text style={styles.title}>Profile</Text>
                 </CopilotView>
             </CopilotStep>
 
             <CopilotStep name="ProfileXP" order={4}
-                         text="Here you can see your current level and how many XP you have earned.">
+                         text="You can also see what your current level is and how many XP you have earned through taking your lessons.">
                 <CopilotView>
                     <View style={styles.xpCard}>
                         <XPBar currentXP={currentXP} level={level}/>
