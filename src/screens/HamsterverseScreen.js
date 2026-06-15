@@ -1,51 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Image, Animated } from 'react-native';
 import XPBar from '../components/XPBar';
 import { colors } from '../styles/GlobalStyles';
-import {fetchAPI} from "../services/Fetch";
-import {useAuth} from "../contexts/AuthContext";
 
 export default function HamsterverseScreen() {
-    const [experience, setExperience] = useState(0);
-    const [currentLevel, setCurrentLevel] = useState(1);
-    const [rewards, setRewards] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [xp, setXP] = useState(0);
+    const [level, setLevel] = useState(1);
     const [bounceAnim] = useState(new Animated.Value(0));
-    const { user } = useAuth();
 
-    // Fetch hamsterverse data from database
-    useEffect(() => {
-        if (user?.id) {
-            loadHamsterverseData();
-        }
-    }, [user]);
-
-    const loadHamsterverseData = async () => {
-        try {
-            setLoading(true);
-            const response = await fetchAPI(`/hamsterverse/${user.id}`, {
-                method: 'GET',
-            });
-
-            if (response.success && response.data) {
-                setExperience(response.data.experience || 0);
-                setCurrentLevel(response.data.currentLevel || 1);
-                setRewards(response.data.rewards || []);
-            }
-        } catch (error) {
-            console.error('Error loading hamsterverse:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Handle XP changes from XPBar
     const handleXPChange = (data) => {
-        setExperience(data.xp);
-        setCurrentLevel(data.level);
-        loadHamsterverseData(); // Reload to get updated rewards
+        setXP(data.xp);
+        setLevel(data.level);
     };
 
-    // Bouncing pip
+    // Bouncing pip animation
     useEffect(() => {
         const animate = () => {
             Animated.sequence([
@@ -56,47 +25,45 @@ export default function HamsterverseScreen() {
         animate();
     }, [bounceAnim]);
 
-    // Filter unlock rewards
-    const unlockedRewards = rewards.filter(reward => reward.isUnlocked === true);
-    const bounce = bounceAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
+    // Calculate items per XP (like original code)
+    const hasFood = xp >= 100;   // Food at 100 XP (Level 2)
+    const hasWheel = xp >= 200;  // Wheel at 200 XP (Level 3)
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.primaryButton} />
-            </View>
-        );
-    }
+    const bounce = bounceAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
 
     return (
         <View style={styles.container}>
+            {/* XPBar component */}
             <View style={styles.xpBarSection}>
-                <XPBar
-                    currentXP={experience}
-                    level={currentLevel}
-                    onXPChange={handleXPChange}
-                />
+                <XPBar onXPChange={handleXPChange} />
             </View>
 
+            {/* Habitat two tone (beige top, orange bottom) */}
             <View style={styles.habitat}>
                 <View style={styles.habitatTop} />
                 <View style={styles.habitatBottom} />
 
-                {unlockedRewards.map((reward) => {
-                    const imageSource = { uri: reward.image_url };
+                {/* Food bowl appears at 100 XP */}
+                {hasFood && (
+                    <Image
+                        source={require('../../public/images/food.png')}
+                        style={styles.foodPosition}
+                        resizeMode="contain"
+                        accessibilityLabel="Food bowl"
+                    />
+                )}
 
-                    return (
-                        <Image
-                            key={reward.id}
-                            source={imageSource}
-                            style={getRewardStyle(reward.title)}
-                            resizeMode="contain"
-                            accessibilityLabel={reward.title}
-                        />
-                    );
-                })}
+                {/* Hamsterwheel appears at 200 XP */}
+                {hasWheel && (
+                    <Image
+                        source={require('../../public/images/wheel.png')}
+                        style={styles.wheelPosition}
+                        resizeMode="contain"
+                        accessibilityLabel="Play wheel"
+                    />
+                )}
 
-                {/* P.I.P. hamster */}
+                {/* P.I.P. single hamster centered in bottom area */}
                 <Animated.View style={[styles.pipContainer, { transform: [{ translateY: bounce }] }]}>
                     <Image
                         source={require('../../public/images/pip-body.png')}
@@ -109,20 +76,6 @@ export default function HamsterverseScreen() {
         </View>
     );
 }
-
-// Helper functie voor de styling per reward title
-const getRewardStyle = (title) => {
-    switch(title) {
-        case 'Feeder':
-            return styles.foodPosition;
-        case 'Hamsterwheel':
-            return styles.wheelPosition;
-        case 'Bridge':
-            return styles.bridgePosition;
-        default:
-            return styles.foodPosition;
-    }
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -152,7 +105,7 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         height: '55%',
-        backgroundColor: colors?.primaryButton || '#F09D67',
+        backgroundColor: colors?.primaryButton || '#F09D67', 
     },
     foodPosition: {
         position: 'absolute',
@@ -167,13 +120,6 @@ const styles = StyleSheet.create({
         bottom: '50%',
         width: 160,
         height: 160,
-    },
-    bridgePosition: {
-        position: 'absolute',
-        left: '5%',
-        bottom: '10%',
-        width: 200,
-        height: 150,
     },
     pipContainer: {
         position: 'absolute',
