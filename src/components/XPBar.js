@@ -7,7 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function XPBar({ refreshTrigger }) {
+export default function XPBar({ onXPChange }) {
     const { user } = useAuth();
     const [xp, setXP] = useState(0);
     const [currentLevel, setCurrentLevel] = useState(1);
@@ -28,7 +28,7 @@ export default function XPBar({ refreshTrigger }) {
             const response = await fetchAPI(`users/${user.id}`, 'GET');
             console.log("User data response:", response);
 
-            if (response?.data) {
+            if (response?.success && response?.data) {
                 const userData = response.data;
                 const experience = userData.experience || 0;
 
@@ -41,6 +41,11 @@ export default function XPBar({ refreshTrigger }) {
                 setXP(currentXP);
                 setCurrentLevel(Math.min(level, MAX_LEVEL));
                 console.log(`XP Update: Total=${experience}, Level=${level}, CurrentXP=${currentXP}`);
+
+                // Stuur de XP en level door naar de parent component
+                if (onXPChange) {
+                    onXPChange({ xp: experience, level: Math.min(level, MAX_LEVEL) });
+                }
             }
         } catch (error) {
             console.error('Error fetching progress:', error);
@@ -60,10 +65,6 @@ export default function XPBar({ refreshTrigger }) {
     useEffect(() => {
         fetchUserProgress();
     }, [user?.id]);
-
-    useEffect(() => {
-        fetchUserProgress();
-    }, [refreshTrigger]);
 
     // Animation for progress bar
     useEffect(() => {

@@ -4,7 +4,7 @@ import {colors} from '../styles/GlobalStyles';
 import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
-import {Image, TouchableOpacity} from "react-native";
+import {Image, TouchableOpacity, Text} from "react-native";
 import HomeStackScreen from "./HomeStackNavigator";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
@@ -34,28 +34,39 @@ export default function BottomTabNavigator() {
                 tabBarStyle: {
                     backgroundColor: colors.navbar,
                 },
-                tabBarActiveTintColor: colors.textCard,
-                tabBarInactiveTintColor: colors.textMain,
+                tabBarActiveTintColor: '#fcf8f2',
+                tabBarInactiveTintColor: '#feead2',
                 headerStyle: {
                     backgroundColor: colors.navbar,
                 },
-                headerTintColor: colors.textCard,
-                headerTitleStyle: {
-                    fontSize: 24,
-                    fontWeight: 'bold',
-                },
-                headerTitle: 'P.I.P.',
+                headerTitle: () => (
+                    <Text
+                        style={{
+                            color: colors.textCard,
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                        }}
+                        accessible={false}
+                    >P.I.P.</Text>
+                ),
                 headerLeft: () => (
                     <Image
                         source={require('../../public/images/pip-head.png')}
                         style={{width: 80, height: 80, marginLeft: 15,}}
                         resizeMode="contain"
+                        accessible={false}
                     />
                 ),
                 headerRight: () => (
                     //open the drawer from clicking on menu button
-                    <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-                                      style={{marginRight: 15}}>
+                    <TouchableOpacity
+                        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                        style={{marginRight: 15}}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel="Open menu"
+                        accessibilityHint="Opens the side navigation drawer"
+                    >
                         <Ionicons name="menu" size={30} color={colors.textCard}/>
                     </TouchableOpacity>
                 ),
@@ -66,6 +77,10 @@ export default function BottomTabNavigator() {
                 component={HamsterverseScreen}
                 options={{
                     tabBarIcon: PlanetIcon,
+                    tabBarAccessibilityLabel: "Hamsterverse tab",
+                    tabBarIcon: ({color, size}) => (
+                        <Ionicons name="planet" color={color} size={size}/>
+                    ),
                 }}
             />
 
@@ -80,6 +95,7 @@ export default function BottomTabNavigator() {
 
                     return {
                         headerShown: !hideHeaderAndTab,
+                        tabBarAccessibilityLabel: "Home tab",
                         tabBarStyle: {
                             display: hideHeaderAndTab ? 'none' : 'flex',
                             backgroundColor: colors.navbar,
@@ -94,6 +110,10 @@ export default function BottomTabNavigator() {
                 component={ProfileScreen}
                 options={{
                     tabBarIcon: ProfileIcon,
+                    tabBarAccessibilityLabel: "Profile tab",
+                    tabBarIcon: ({color, size}) => (
+                        <Ionicons name="person" color={color} size={size}/>
+                    ),
                 }}
             />
 

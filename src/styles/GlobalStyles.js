@@ -25,7 +25,7 @@ export const colors = {
     secondary: '#FFFFFF',
     navbar: '#6D4C41',
     accent: '#784F4E',
-    textMain: '#1A1A1A',
+    textMain: '#141414',
     textCard: '#FFFFFF',
 
     primaryButton: '#D97706',

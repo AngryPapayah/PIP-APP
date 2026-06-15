@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, Image, Animated } from 'react-native';
 import XPBar from '../components/XPBar';
 import { colors } from '../styles/GlobalStyles';
 
@@ -8,19 +8,13 @@ export default function HamsterverseScreen() {
     const [level, setLevel] = useState(1);
     const [bounceAnim] = useState(new Animated.Value(0));
 
+    // Handle XP changes from XPBar
     const handleXPChange = (data) => {
         setXP(data.xp);
         setLevel(data.level);
     };
 
-    // const increaseXP = () => {
-    //     const newXP = xp + 50;
-    //     setXP(newXP);
-    //     const newLevel = Math.floor(newXP / 100) + 1;
-    //     setLevel(newLevel);
-    // }
-
-    // Bouncing pip
+    // Bouncing pip animation
     useEffect(() => {
         const animate = () => {
             Animated.sequence([
@@ -31,10 +25,9 @@ export default function HamsterverseScreen() {
         animate();
     }, [bounceAnim]);
 
-    // calculate items per xp
-    const hasFood = xp >= 100;
-    const hasWheel = xp >= 200;
-    const hasBridge = xp >= 300;
+    // Calculate items per XP (like original code)
+    const hasFood = xp >= 100;   // Food at 100 XP (Level 2)
+    const hasWheel = xp >= 200;  // Wheel at 200 XP (Level 3)
 
     const bounce = bounceAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
 
@@ -42,23 +35,15 @@ export default function HamsterverseScreen() {
         <View style={styles.container}>
             {/* XPBar component */}
             <View style={styles.xpBarSection}>
-                <XPBar
-                    currentXP={xp}
-                    level={level}
-                    onXPChange={handleXPChange}
-                />
+                <XPBar onXPChange={handleXPChange} />
             </View>
-
-            {/*<TouchableOpacity style={styles.xpButton} onPress={increaseXP}>*/}
-            {/*    <Text style={styles.xpButtonText}>+50 XP</Text>*/}
-            {/*</TouchableOpacity>*/}
 
             {/* Habitat two tone (beige top, orange bottom) */}
             <View style={styles.habitat}>
                 <View style={styles.habitatTop} />
                 <View style={styles.habitatBottom} />
 
-                {/*moet aangepast worden*/}
+                {/* Food bowl appears at 100 XP */}
                 {hasFood && (
                     <Image
                         source={require('../../public/images/food.png')}
@@ -68,21 +53,13 @@ export default function HamsterverseScreen() {
                     />
                 )}
 
+                {/* Hamsterwheel appears at 200 XP */}
                 {hasWheel && (
                     <Image
                         source={require('../../public/images/wheel.png')}
                         style={styles.wheelPosition}
                         resizeMode="contain"
                         accessibilityLabel="Play wheel"
-                    />
-                )}
-
-                {hasBridge && (
-                    <Image
-                        source={require('../../public/images/bridge.png')}
-                        style={styles.bridgePosition}
-                        resizeMode="contain"
-                        accessibilityLabel="Play bridge"
                     />
                 )}
 
@@ -128,10 +105,7 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         height: '55%',
-        backgroundColor: colors?.primaryButton || '#F09D67', //was in wireframe the same
-    },
-    item: {
-        position: 'absolute',
+        backgroundColor: colors?.primaryButton || '#F09D67', 
     },
     foodPosition: {
         position: 'absolute',
@@ -146,13 +120,6 @@ const styles = StyleSheet.create({
         bottom: '50%',
         width: 160,
         height: 160,
-    },
-    bridgePosition: {
-        position: 'absolute',
-        left: '5%',
-        bottom: '10%',
-        width: 200,
-        height: 150,
     },
     pipContainer: {
         position: 'absolute',
