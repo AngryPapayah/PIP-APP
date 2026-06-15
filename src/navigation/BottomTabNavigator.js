@@ -15,6 +15,18 @@ export default function BottomTabNavigator() {
 
     const navigation = useNavigation()
 
+    const PlanetIcon = ({color, size}) => (
+        <Ionicons name="planet" color={color} size={size}/>
+    );
+
+    const HomeIcon = ({color, size}) => (
+        <Ionicons name="home" color={color} size={size}/>
+    );
+
+    const ProfileIcon = ({color, size}) => (
+        <Ionicons name="person" color={color} size={size}/>
+    );
+
     return (
         <Tab.Navigator
             initialRouteName="Home"
@@ -64,6 +76,7 @@ export default function BottomTabNavigator() {
                 name="Hamsterverse"
                 component={HamsterverseScreen}
                 options={{
+                    tabBarIcon: PlanetIcon,
                     tabBarAccessibilityLabel: "Hamsterverse tab",
                     tabBarIcon: ({color, size}) => (
                         <Ionicons name="planet" color={color} size={size}/>
@@ -87,9 +100,7 @@ export default function BottomTabNavigator() {
                             display: hideHeaderAndTab ? 'none' : 'flex',
                             backgroundColor: colors.navbar,
                         },
-                        tabBarIcon: ({color, size}) => (
-                            <Ionicons name="home" color={color} size={size}/>
-                        ),
+                        tabBarIcon: HomeIcon,
                     };
                 }}
             />
@@ -98,6 +109,7 @@ export default function BottomTabNavigator() {
                 name="Profile"
                 component={ProfileScreen}
                 options={{
+                    tabBarIcon: ProfileIcon,
                     tabBarAccessibilityLabel: "Profile tab",
                     tabBarIcon: ({color, size}) => (
                         <Ionicons name="person" color={color} size={size}/>
