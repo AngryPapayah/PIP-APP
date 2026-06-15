@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: globalStyles?.text.fontSize || 18,
         textAlign: 'center',
-        color: '#FFFFFF',
+        color: '#0d0d0d',
         fontWeight: 'bold'
     },
     iconContainer: {
