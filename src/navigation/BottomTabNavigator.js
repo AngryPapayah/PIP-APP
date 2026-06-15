@@ -78,9 +78,6 @@ export default function BottomTabNavigator() {
                 options={{
                     tabBarIcon: PlanetIcon,
                     tabBarAccessibilityLabel: "Hamsterverse tab",
-                    tabBarIcon: ({color, size}) => (
-                        <Ionicons name="planet" color={color} size={size}/>
-                    ),
                 }}
             />
 
@@ -111,9 +108,6 @@ export default function BottomTabNavigator() {
                 options={{
                     tabBarIcon: ProfileIcon,
                     tabBarAccessibilityLabel: "Profile tab",
-                    tabBarIcon: ({color, size}) => (
-                        <Ionicons name="person" color={color} size={size}/>
-                    ),
                 }}
             />
 
