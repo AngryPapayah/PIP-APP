@@ -1,53 +1,72 @@
 import 'react-native-gesture-handler';
 import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-// dit is voor context enzo
-import { LoadingProvider } from './src/contexts/LoadingContext';
+import { LoadingProvider, useLoading } from './src/contexts/LoadingContext';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
-import FilterProvider from "./src/contexts/FilterContext";
+import LanguageProvider from './src/contexts/LanguageContext';
+import FilterProvider from './src/contexts/FilterContext';
 
-// dit zijn de screens
-import { LoadingScreen } from './src/screens/LoadingScreen';
+import LoadingScreen from './src/screens/LoadingScreen';
 import LoginScreen from "./src/screens/LoginScreen";
 import SignupScreen from "./src/screens/SignupScreen";
 import MainDrawerNavigator from "./src/navigation/MainDrawerNavigator";
+
+import LessonsList from './src/screens/courses/modules/lessons/LessonsList';
+import QuestionsScreen from './src/screens/QuestionsScreen';
+import ResultScreen from './src/screens/ResultScreen';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
     const { user, loading: authLoading } = useAuth();
+    const { loading: globalLoading } = useLoading();
 
-    // Dit is voor eerste kee check of auth geweest is
     if (authLoading) {
         return <LoadingScreen />;
     }
 
     return (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {user ? (
-                <Stack.Screen name="Main" component={MainDrawerNavigator} />
-            ) : (
-                <>
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Signup" component={SignupScreen} />
-                </>
+        <View style={{ flex: 1 }}>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                {user ? (
+                    <>
+                        <Stack.Screen name="Main" component={MainDrawerNavigator} />
+                        <Stack.Screen name="LessonsList" component={LessonsList} />
+                        <Stack.Screen name="QuestionsScreen" component={QuestionsScreen} />
+                        <Stack.Screen name="ResultScreen" component={ResultScreen} />
+                    </>
+                ) : (
+                    <>
+                        <Stack.Screen name="Login" component={LoginScreen} />
+                        <Stack.Screen name="Signup" component={SignupScreen} />
+                    </>
+                )}
+            </Stack.Navigator>
+
+            {globalLoading && (
+                <View style={StyleSheet.absoluteFill}>
+                    <LoadingScreen />
+                </View>
             )}
-        </Stack.Navigator>
+        </View>
     );
 };
 
 export default function App() {
     return (
-        <LoadingProvider>
-            <AuthProvider>
-                <FilterProvider>
-                    <NavigationContainer>
-                        <AppNavigator />
-                    </NavigationContainer>
-                </FilterProvider>
-            </AuthProvider>
-        </LoadingProvider>
+        <LanguageProvider>
+            <LoadingProvider>
+                <AuthProvider>
+                    <FilterProvider>
+                        <NavigationContainer>
+                            <AppNavigator />
+                        </NavigationContainer>
+                    </FilterProvider>
+                </AuthProvider>
+            </LoadingProvider>
+        </LanguageProvider>
     );
 }

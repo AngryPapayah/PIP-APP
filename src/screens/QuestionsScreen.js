@@ -1,177 +1,99 @@
 import MultipleChoice from "../components/MultipleChoice";
-import {useNavigation, useRoute} from "@react-navigation/native";
-import {useEffect, useState} from "react";
-import {SafeAreaView, StyleSheet, Text} from "react-native";
-import {colors} from "../styles/GlobalStyles";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { SafeAreaView, StyleSheet, Text, Alert } from "react-native";
+import { colors } from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
-import {fetchAPI} from "../services/Fetch";
+import { fetchAPI } from "../services/Fetch";
 import ProgressBar from "../components/ProgressBar";
-import {useAuth} from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useLoading } from "../contexts/LoadingContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function QuestionsScreen() {
-
     const route = useRoute();
     const navigation = useNavigation();
-    const {user} = useAuth(); // Get user from AuthContext
-    const {moduleId, lessonId} = route.params;
+    const { user } = useAuth();
+    const { setLoading } = useLoading();
+    const { t } = useLanguage();
+    const { moduleId, lessonId } = route.params;
 
     const [questions, setQuestions] = useState([]);
     const [attemptId, setAttemptId] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
-    const [loading, setLoading] = useState(true)
-    const [score, setScore] = useState(0); // State to track score
+    const [score, setScore] = useState(0);
 
-    // Use the user's ID from the context
     const userId = user?.id;
 
-
     useEffect(() => {
-        // Make sure we have a userId before fetching questions
-        if (userId) {
-            getQuestions()
-        }
+        if (userId) getQuestions();
     }, [moduleId, lessonId, userId])
 
     async function getQuestions() {
         setLoading(true)
         try {
-
-            let currentAttemptId = attemptId;
-
-            //start the lesson and save the attempt id
-            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', {
-                userId: userId
-            })
-            console.log("START DATA:", JSON.stringify(startData, null, 2));
-
+            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', { userId: userId })
             if (startData && startData.error) {
-                console.error("API Error:", startData.error);
-                setLoading(false);
+                Alert.alert(t.ui.error, startData.error);
                 return;
             }
+            setAttemptId(startData.attemptId)
 
-            currentAttemptId = startData.attemptId
-            setAttemptId(currentAttemptId)
-            console.log("Nieuw Attempt ID aangemaakt door backend:", startData.attemptId);
-
-            //get the questions from the lesson
             const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
-
             if (questionData && questionData.error) {
-                console.error("API Error:", questionData.error);
-                setLoading(false);
+                Alert.alert(t.ui.error, questionData.error);
                 return;
             }
 
-
-            //get per question the belonging answers
             const fullQuestions = await Promise.all(
                 questionData.map(async (question) => {
-
                     const answerData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET')
-
-                    if (answerData && answerData.error) {
-                        console.error("API Error:", answerData.error);
-                        setLoading(false);
-                        return;
-                    }
-
-                    console.log("DIT GEEFT DE ANTWOORDEN API TERUG:", answerData);
-                    //return the question and attach the associated answers array
-                    return {...question, answers: answerData.answers}
+                    return { ...question, answers: answerData.answers }
                 })
             )
-
-            // Shuffle the questions array to randomize the order
-            const shuffledQuestions = [...fullQuestions].sort(() => Math.random() - 0.5);
-
-            setQuestions(shuffledQuestions)
-            setLoading(false)
-
-
+            setQuestions(fullQuestions.sort(() => Math.random() - 0.5))
         } catch (error) {
-            console.error("Er is een fout opgetreden", error);
-
+            Alert.alert(t.ui.error, t.errors.generic);
+        } finally {
+            setLoading(false)
         }
     }
 
-    //to navigate to the next question or end the lesson
     async function handleNext(isCorrect) {
-        if (isCorrect) {
-            setScore(prevScore => prevScore + 10); // Add 10 points for a correct answer
-        }
-
+        if (isCorrect) setScore(prevScore => prevScore + 10);
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
+            setLoading(true);
             try {
-                // Attempt to complete the lesson, but don't let it block navigation.
-                await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', {userId: userId});
+                await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId: userId });
+                navigation.navigate("ResultScreen", { attemptId, lessonId, score: score + (isCorrect ? 10 : 0) });
             } catch (error) {
-                console.error("Er is een fout opgetreden bij het voltooien van de les:", error);
+                Alert.alert(t.ui.error, t.errors.finishError);
             } finally {
-                // Always navigate to the result screen.
-                navigation.navigate("ResultScreen", {attemptId: attemptId, lessonId: lessonId});
-                navigation.navigate("ResultScreen", {score: score + (isCorrect ? 10 : 0)});
+                setLoading(false);
             }
         } else {
             setCurrentIndex(currentIndex + 1);
         }
     }
 
-    // Show a message if the user is not logged in
-    if (!userId) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text>Please log in to view questions.</Text>
-            </SafeAreaView>
-        )
-    }
+    if (!userId) return <SafeAreaView style={styles.container}><Text>{t.errors.loginRequired}</Text></SafeAreaView>;
+    if (questions.length === 0 && !currentIndex) return null;
+    if (questions.length === 0) return <SafeAreaView style={styles.container}><Text>{t.errors.noQuestions}</Text></SafeAreaView>;
 
-    //temporary loading screen
-    if (loading || !attemptId) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text>Questions are loading...</Text>
-            </SafeAreaView>
-        )
-    }
-
-    //fallback if api list is empty
-    if (questions.length === 0) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text>No questions found for this lesson</Text>
-            </SafeAreaView>
-        )
-    }
-
-    //select active question based on the current index
     const currentQuestion = questions[currentIndex];
-    const isLastQuestion = currentIndex === questions.length - 1;
 
     return (
         <SafeAreaView style={styles.container}>
-            {/*progress visualisation*/}
-            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
-
-            {/*rendering component based on question type*/}
+            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length} />
             {currentQuestion?.question_type === "multiple_choice" ? (
-                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}
-                                isLastQuestion={isLastQuestion}></MultipleChoice>
+                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={currentIndex === questions.length - 1} />
             ) : (
-                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}
-                           isLastQuestion={isLastQuestion}></SwipeCard>
+                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={currentIndex === questions.length - 1} />
             )}
         </SafeAreaView>
     )
-
 }
 
-const styles = StyleSheet.create({
-    container: {
-        padding: 10,
-        flex: 1,
-        backgroundColor: colors?.primary || '#FFDFAD',
-    }
-});
+const styles = StyleSheet.create({ container: { padding: 10, flex: 1, backgroundColor: colors?.primary || '#FFDFAD' } });
