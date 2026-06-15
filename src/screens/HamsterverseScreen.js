@@ -1,24 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, Image, Animated, ActivityIndicator } from 'react-native';
 import XPBar from '../components/XPBar';
 import { colors } from '../styles/GlobalStyles';
+import {fetchAPI} from "../services/Fetch";
+import {useAuth} from "../contexts/AuthContext";
 
 export default function HamsterverseScreen() {
-    const [xp, setXP] = useState(0);
-    const [level, setLevel] = useState(1);
+    const [experience, setExperience] = useState(0);
+    const [currentLevel, setCurrentLevel] = useState(1);
+    const [rewards, setRewards] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [bounceAnim] = useState(new Animated.Value(0));
+    const { user } = useAuth();
 
-    const handleXPChange = (data) => {
-        setXP(data.xp);
-        setLevel(data.level);
+    // Fetch hamsterverse data from database
+    useEffect(() => {
+        if (user?.id) {
+            loadHamsterverseData();
+        }
+    }, [user]);
+
+    const loadHamsterverseData = async () => {
+        try {
+            setLoading(true);
+            const response = await fetchAPI(`/hamsterverse/${user.id}`, {
+                method: 'GET',
+            });
+
+            if (response.success && response.data) {
+                setExperience(response.data.experience || 0);
+                setCurrentLevel(response.data.currentLevel || 1);
+                setRewards(response.data.rewards || []);
+            }
+        } catch (error) {
+            console.error('Error loading hamsterverse:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // const increaseXP = () => {
-    //     const newXP = xp + 50;
-    //     setXP(newXP);
-    //     const newLevel = Math.floor(newXP / 100) + 1;
-    //     setLevel(newLevel);
-    // }
+    const handleXPChange = (data) => {
+        setExperience(data.xp);
+        setCurrentLevel(data.level);
+        loadHamsterverseData(); // Reload to get updated rewards
+    };
 
     // Bouncing pip
     useEffect(() => {
@@ -31,62 +56,47 @@ export default function HamsterverseScreen() {
         animate();
     }, [bounceAnim]);
 
-    // calculate items per xp
-    const hasFood = xp >= 100;
-    const hasWheel = xp >= 200;
-    const hasBridge = xp >= 300;
-
+    // Filter unlock rewards
+    const unlockedRewards = rewards.filter(reward => reward.isUnlocked === true);
     const bounce = bounceAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.primaryButton} />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
-            {/* XPBar component */}
             <View style={styles.xpBarSection}>
                 <XPBar
-                    currentXP={xp}
-                    level={level}
+                    currentXP={experience}
+                    level={currentLevel}
                     onXPChange={handleXPChange}
                 />
             </View>
 
-            {/*<TouchableOpacity style={styles.xpButton} onPress={increaseXP}>*/}
-            {/*    <Text style={styles.xpButtonText}>+50 XP</Text>*/}
-            {/*</TouchableOpacity>*/}
-
-            {/* Habitat two tone (beige top, orange bottom) */}
             <View style={styles.habitat}>
                 <View style={styles.habitatTop} />
                 <View style={styles.habitatBottom} />
 
-                {/*moet aangepast worden*/}
-                {hasFood && (
-                    <Image
-                        source={require('../../public/images/food.png')}
-                        style={styles.foodPosition}
-                        resizeMode="contain"
-                        accessibilityLabel="Food bowl"
-                    />
-                )}
+                {unlockedRewards.map((reward) => {
+                    const imageSource = { uri: reward.image_url };
 
-                {hasWheel && (
-                    <Image
-                        source={require('../../public/images/wheel.png')}
-                        style={styles.wheelPosition}
-                        resizeMode="contain"
-                        accessibilityLabel="Play wheel"
-                    />
-                )}
+                    return (
+                        <Image
+                            key={reward.id}
+                            source={imageSource}
+                            style={getRewardStyle(reward.title)}
+                            resizeMode="contain"
+                            accessibilityLabel={reward.title}
+                        />
+                    );
+                })}
 
-                {hasBridge && (
-                    <Image
-                        source={require('../../public/images/bridge.png')}
-                        style={styles.bridgePosition}
-                        resizeMode="contain"
-                        accessibilityLabel="Play bridge"
-                    />
-                )}
-
-                {/* P.I.P. single hamster centered in bottom area */}
+                {/* P.I.P. hamster */}
                 <Animated.View style={[styles.pipContainer, { transform: [{ translateY: bounce }] }]}>
                     <Image
                         source={require('../../public/images/pip-body.png')}
@@ -99,6 +109,20 @@ export default function HamsterverseScreen() {
         </View>
     );
 }
+
+// Helper functie voor de styling per reward title
+const getRewardStyle = (title) => {
+    switch(title) {
+        case 'Feeder':
+            return styles.foodPosition;
+        case 'Hamsterwheel':
+            return styles.wheelPosition;
+        case 'Bridge':
+            return styles.bridgePosition;
+        default:
+            return styles.foodPosition;
+    }
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -128,10 +152,7 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         height: '55%',
-        backgroundColor: colors?.primaryButton || '#F09D67', //was in wireframe the same
-    },
-    item: {
-        position: 'absolute',
+        backgroundColor: colors?.primaryButton || '#F09D67',
     },
     foodPosition: {
         position: 'absolute',
