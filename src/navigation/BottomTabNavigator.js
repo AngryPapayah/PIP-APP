@@ -22,8 +22,8 @@ export default function BottomTabNavigator() {
                 tabBarStyle: {
                     backgroundColor: colors.navbar,
                 },
-                tabBarActiveTintColor: colors.textCard,
-                tabBarInactiveTintColor: colors.textMain,
+                tabBarActiveTintColor: '#feead2',
+                tabBarInactiveTintColor: '#feead2',
                 headerStyle: {
                     backgroundColor: colors.navbar,
                 },
@@ -38,12 +38,21 @@ export default function BottomTabNavigator() {
                         source={require('../../public/images/pip-head.png')}
                         style={{width: 80, height: 80, marginLeft: 15,}}
                         resizeMode="contain"
+                        accessible={true}
+                        accessibilityRole="image"
+                        accessibilityLabel="P.I.P. logo"
                     />
                 ),
                 headerRight: () => (
                     //open the drawer from clicking on menu button
-                    <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-                                      style={{marginRight: 15}}>
+                    <TouchableOpacity 
+                        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+                        style={{marginRight: 15}}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel="Open menu"
+                        accessibilityHint="Opens the side navigation drawer"
+                    >
                         <Ionicons name="menu" size={30} color={colors.textCard}/>
                     </TouchableOpacity>
                 ),
@@ -53,6 +62,7 @@ export default function BottomTabNavigator() {
                 name="Hamsterverse"
                 component={HamsterverseScreen}
                 options={{
+                    tabBarAccessibilityLabel: "Hamsterverse tab",
                     tabBarIcon: ({color, size}) => (
                         <Ionicons name="planet" color={color} size={size}/>
                     ),
@@ -70,6 +80,7 @@ export default function BottomTabNavigator() {
 
                     return {
                         headerShown: !hideHeaderAndTab,
+                        tabBarAccessibilityLabel: "Home tab",
                         tabBarStyle: {
                             display: hideHeaderAndTab ? 'none' : 'flex',
                             backgroundColor: colors.navbar,
@@ -85,6 +96,7 @@ export default function BottomTabNavigator() {
                 name="Profile"
                 component={ProfileScreen}
                 options={{
+                    tabBarAccessibilityLabel: "Profile tab",
                     tabBarIcon: ({color, size}) => (
                         <Ionicons name="person" color={color} size={size}/>
                     ),
