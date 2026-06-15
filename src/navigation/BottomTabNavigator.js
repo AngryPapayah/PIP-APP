@@ -4,7 +4,7 @@ import {colors} from '../styles/GlobalStyles';
 import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
 import {Ionicons} from '@expo/vector-icons';
-import {Image, TouchableOpacity} from "react-native";
+import {Image, TouchableOpacity, Text} from "react-native";
 import HomeStackScreen from "./HomeStackNavigator";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
@@ -27,25 +27,27 @@ export default function BottomTabNavigator() {
                 headerStyle: {
                     backgroundColor: colors.navbar,
                 },
-                headerTintColor: colors.textCard,
-                headerTitleStyle: {
-                    fontSize: 24,
-                    fontWeight: 'bold',
-                },
-                headerTitle: 'P.I.P.',
+                headerTitle: () => (
+                    <Text
+                        style={{
+                            color: colors.textCard,
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                        }}
+                        accessible={false}
+                    >P.I.P.</Text>
+                ),
                 headerLeft: () => (
                     <Image
                         source={require('../../public/images/pip-head.png')}
                         style={{width: 80, height: 80, marginLeft: 15,}}
                         resizeMode="contain"
-                        accessible={true}
-                        accessibilityRole="image"
-                        accessibilityLabel="P.I.P. logo"
+                        accessible={false}
                     />
                 ),
                 headerRight: () => (
                     //open the drawer from clicking on menu button
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
                         style={{marginRight: 15}}
                         accessible={true}
