@@ -105,7 +105,7 @@ export default function SwipeCard({question, attemptId, onNext, isLastQuestion})
             <View style={styles.pipContainer}>
                 <TextBubble
                     text={hasAnswered ? (question?.explanation || '') : (question?.question_text || question?.title || "Loading Question...")}/>
-                <Image source={pipImage} style={styles.pipImage} resizeMode="contain" accessible={true}
+                <Image source={pipImage} style={styles.pipImage} resizeMode="contain" accessible={false}
                        accessibilityLabel={pipAltText}/>
             </View>
             {hasAnswered ? (

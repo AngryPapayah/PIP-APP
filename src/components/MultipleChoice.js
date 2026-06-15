@@ -78,8 +78,7 @@ export default function MultipleChoice({question, attemptId, onNext, isLastQuest
                         source={pipImage}
                         style={{width: 200, height: 200, marginLeft: 15,}}
                         resizeMode="contain"
-                        accessible={true}
-                        accessibilityLabel={pipAltText}
+                        accessible={false}
                     />
 
                     <View>
@@ -98,8 +97,7 @@ export default function MultipleChoice({question, attemptId, onNext, isLastQuest
                         source={pipImage}
                         style={{width: 200, height: 200, marginLeft: 15,}}
                         resizeMode="contain"
-                        accessible={true}
-                        accessibilityLabel={pipAltText}
+                        accessible={false}
                     />
                 </View>
             )}
