@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import {
     StyleSheet,
     Text,
-    View,
     TextInput,
     TouchableOpacity,
     Image,
@@ -11,7 +10,7 @@ import {
     ScrollView
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {globalStyles, colors} from "../styles/GlobalStyles";
+import {colors} from "../styles/GlobalStyles";
 import TextBubble from "../components/TextBubble";
 import {fetchAPI} from "../services/Fetch";
 import {useAuth} from "../contexts/AuthContext";
@@ -23,7 +22,7 @@ const conversation = [
 ];
 
 export default function LoginScreen({navigation}) {
-    const { login } = useAuth();
+    const {login} = useAuth();
     // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -59,7 +58,19 @@ export default function LoginScreen({navigation}) {
             } else {
                 // Store user data in context
                 console.log('Login successful:', data);
-                login(data.data.user); // Store user data.
+                // login(data.data.user); // Store user data.
+
+                const user = data.data?.user
+                const needsOnboarding = user?.on_boarding === 0
+
+                if (needsOnboarding) {
+                    user.startTour = true
+                    login(user)
+                } else {
+                    login(user)
+                }
+
+
             }
         } catch (error) {
             setErrorMessage('An unexpected error occurred. Please try again.');
@@ -78,7 +89,7 @@ export default function LoginScreen({navigation}) {
                 style={styles.keyboardAvoidingView}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                <ScrollView 
+                <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"

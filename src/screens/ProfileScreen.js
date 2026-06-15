@@ -1,21 +1,67 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, ScrollView} from 'react-native';
-import {globalStyles, colors} from '../styles/GlobalStyles';
+import {colors} from '../styles/GlobalStyles';
 import {useAuth} from '../contexts/AuthContext';
 import XPBar from '../components/XPBar';
+import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
+import {useNavigation, useRoute} from "@react-navigation/native";
 
-const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience'];
+const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience', 'startTour'];
 
 const labelMap = {
     Digital_skill_level: 'Digital skill level',
 };
 
+const CopilotView = walkthroughable(({style, children, ...props}) => (
+    <View style={style} {...props}>{children}</View>
+));
+
 export default function ProfileScreen() {
-    const { logout, user } = useAuth();
+    const {logout, user} = useAuth();
+    const navigation = useNavigation()
+    const route = useRoute()
+
+    //onboarding
+    const {start, copilotEvents} = useCopilot()
+    const [isLayoutReady, setIsLayoutReady] = useState(false);
 
     const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? 0;
     const level = Math.floor(xp / 100) + 1;
     const currentXP = xp % 100;
+
+
+    //onboarding
+    useEffect(() => {
+        const starting = route?.params?.startTour
+
+        if (isLayoutReady && starting) {
+            console.log("LOG: Profile layout klaar. Start profiel-tour!");
+            const timer = setTimeout(() => {
+                start("ProfileText");
+            }, 600);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isLayoutReady, route?.params]);
+
+    //onboarding
+    useEffect(() => {
+
+        copilotEvents.on('start', () => {
+            console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
+        });
+
+        copilotEvents.on('stop', () => {
+            console.log("Tour op profile klaar, naar hamsterverse")
+            navigation.navigate('Hamsterverse', {startTour: true})
+        })
+
+        return () => {
+            copilotEvents.off('start')
+            copilotEvents.off('stop')
+        }
+    }, []);
+
 
     const formatLabel = (key) => {
         if (labelMap[key]) return labelMap[key];
@@ -29,15 +75,28 @@ export default function ProfileScreen() {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={globalStyles?.text || styles.title}>Profile</Text>
+        <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
+            <CopilotStep name="ProfileText" order={3}
+                         text="Welcome to your profile. Here you see your profile information.">
+                <CopilotView>
+                    <Text style={styles.title}>Profile</Text>
+                </CopilotView>
+            </CopilotStep>
 
-            <View style={styles.xpCard}>
-                <XPBar currentXP={currentXP} level={level} />
-            </View>
+            <CopilotStep name="ProfileXP" order={4}
+                         text="Here you can see your current level and how many XP you have earned.">
+                <CopilotView>
+                    <View style={styles.xpCard}>
+                        <XPBar currentXP={currentXP} level={level}/>
+                    </View>
+                </CopilotView>
+            </CopilotStep>
+
 
             {user && (
+
                 <View style={styles.card}>
+
                     {Object.entries(user)
                         .filter(([key]) => !hiddenFields.includes(key))
                         .map(([key, value]) => (
@@ -46,7 +105,9 @@ export default function ProfileScreen() {
                                 <Text style={styles.value}>{renderValue(value)}</Text>
                             </View>
                         ))}
+
                 </View>
+
             )}
 
             <TouchableOpacity style={styles.logoutButton} onPress={logout}>
@@ -64,9 +125,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        fontSize: 35,
+        fontWeight: "bold",
+        textAlign: "center",
+        marginVertical: 10
     },
     xpCard: {
         width: '100%',
