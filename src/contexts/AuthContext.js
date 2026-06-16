@@ -43,7 +43,9 @@ export const AuthProvider = ({ children }) => {
             setUser((prevUser) => {
                 if (!prevUser) return null;
                 const updatedUser = { ...prevUser, ...updates };
-                AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+                AsyncStorage.setItem('user', JSON.stringify(updatedUser)).catch(err =>
+                    console.error("Failed to sync updated user to AsyncStorage", err)
+                );
                 return updatedUser;
             });
         } catch (e) {
@@ -63,25 +65,6 @@ export const AuthProvider = ({ children }) => {
             console.error("[AuthContext] Logout failed:", e);
         }
     };
-
-    //onboarding
-    const updateUser = async (updatedFields) => {
-        try {
-            setUser((prevUser) => {
-                if (!prevUser) return null;
-
-                const newUser = {...prevUser, ...updatedFields};
-                AsyncStorage.setItem('user', JSON.stringify(newUser)).catch(err =>
-                    console.error("Failed to sync updated user to AsyncStorage", err)
-                );
-
-                return newUser;
-            });
-        } catch (e) {
-            console.error("Failed to update user state", e);
-        }
-    };
-
 
     return (
         <AuthContext.Provider value={{user, login, logout, loading, updateUser}}>
