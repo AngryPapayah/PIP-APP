@@ -8,11 +8,15 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLoading } from "../contexts/LoadingContext";
 import { useLanguage } from "../contexts/LanguageContext";
 
-export default function LoginScreen({ navigation }) {
-    const { login } = useAuth();
-    const { setLoading } = useLoading();
-    const { t } = useLanguage();
+const conversation = [
+    "Welcome to P.I.P.",
+    "Your Parental Informative Program.",
+    "Let's get started!"
+];
 
+export default function LoginScreen({navigation}) {
+    const {login} = useAuth();
+    // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -40,10 +44,21 @@ export default function LoginScreen({ navigation }) {
             if (response.error) {
                 setErrorMessage(response.error);
             } else {
-                if (USE_JWT && response.token) {
-                    await storeToken(response.token);
+                // Store user data in context
+                console.log('Login successful:', data);
+                // login(data.data.user); // Store user data.
+
+                const user = data.data?.user
+                const needsOnboarding = user?.on_boarding === 0
+
+                if (needsOnboarding) {
+                    user.startTour = true
+                    login(user)
+                } else {
+                    login(user)
                 }
-                login(response.data?.user || response.user);
+
+
             }
         } catch (error) {
             setErrorMessage(t.errors.startled);
@@ -54,13 +69,41 @@ export default function LoginScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-                <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-                    <TextBubble text={conversation[messageIndex]} onAnimationComplete={handleNextMessage} />
-                    <Image source={require('../../public/images/pip-body.png')} style={styles.image} resizeMode="contain" />
-
-                    <TextInput style={styles.input} placeholder={t.ui.email} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-                    <TextInput style={styles.input} placeholder={t.ui.password} value={password} onChangeText={setPassword} secureTextEntry />
+            <KeyboardAvoidingView
+                style={styles.keyboardAvoidingView}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <TextBubble
+                        text={conversation[messageIndex]}
+                        onAnimationComplete={handleNextMessage}
+                    />
+                    <Image
+                        source={require('../../public/images/pip-body.png')}
+                        style={{width: 200, height: 200, marginLeft: 15,}}
+                        resizeMode="contain"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        placeholderTextColor="#888"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        placeholderTextColor="#888"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
 
                     {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 

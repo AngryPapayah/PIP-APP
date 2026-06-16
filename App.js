@@ -18,6 +18,16 @@ import LessonsList from './src/screens/courses/modules/lessons/LessonsList';
 import QuestionsScreen from './src/screens/QuestionsScreen';
 import ResultScreen from './src/screens/ResultScreen';
 
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import LoginScreen from "./src/screens/LoginScreen";
+import SignupScreen from "./src/screens/SignupScreen";
+import MainDrawerNavigator from "./src/navigation/MainDrawerNavigator";
+import FilterProvider from "./src/contexts/FilterContext";
+import {AuthProvider, useAuth} from './src/contexts/AuthContext';
+import {LoadingScreen} from './src/screens/LoadingScreen';
+import {CopilotProvider} from "react-native-copilot";
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -50,6 +60,22 @@ const AppNavigator = () => {
                 <View style={StyleSheet.absoluteFill}>
                     <LoadingScreen />
                 </View>
+
+    const {user, loading} = useAuth();
+
+    if (loading) {
+        return <LoadingScreen/>;
+    }
+
+    return (
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+            {user ? (
+                <Stack.Screen name="Main" component={MainDrawerNavigator}/>
+            ) : (
+                <>
+                    <Stack.Screen name="Login" component={LoginScreen}/>
+                    <Stack.Screen name="Signup" component={SignupScreen}/>
+                </>
             )}
         </View>
     );
@@ -57,16 +83,14 @@ const AppNavigator = () => {
 
 export default function App() {
     return (
-        <LanguageProvider>
-            <LoadingProvider>
-                <AuthProvider>
-                    <FilterProvider>
-                        <NavigationContainer>
-                            <AppNavigator />
-                        </NavigationContainer>
-                    </FilterProvider>
-                </AuthProvider>
-            </LoadingProvider>
-        </LanguageProvider>
+        <AuthProvider>
+            <CopilotProvider labels={{previous: "", next: "Next", skip: "Skip", finish: "Finish"}}>
+                <FilterProvider>
+                    <NavigationContainer>
+                        <AppNavigator/>
+                    </NavigationContainer>
+                </FilterProvider>
+            </CopilotProvider>
+        </AuthProvider>
     );
 }
