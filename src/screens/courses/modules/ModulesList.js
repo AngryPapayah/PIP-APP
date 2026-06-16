@@ -34,7 +34,6 @@ export default function ModulesList() {
 
             setModules(data);
         } catch (error) {
-            console.error("An error occurred while fetching modules:", error);
             Alert.alert(t.ui.error, t.errors.generic);
         } finally {
             setLoading(false);
@@ -45,8 +44,7 @@ export default function ModulesList() {
         const allModules = Object.values(modules);
 
         if (selectedTitle) {
-            const result = allModules.filter(module => module.title === selectedTitle);
-            setFilteredModules(result);
+            setFilteredModules(allModules.filter(module => module.title === selectedTitle));
         } else {
             setFilteredModules(allModules);
         }
@@ -78,20 +76,12 @@ const styles = StyleSheet.create({
     container: {
         padding: 10,
         flex: 1,
-        backgroundColor: colors?.primary || '#fff',
+        backgroundColor: colors?.primary || '#F4E1C1',
     },
     listContainer: {
         padding: 20,
     },
     itemWrapper: {
         marginBottom: 20
-    },
-    text: {
-        fontSize: 20,
-        fontWeight: "bold",
-        textAlign: "center",
-    },
-    backButton: {
-        padding: 10,
-    },
+    }
 });

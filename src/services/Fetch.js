@@ -3,11 +3,17 @@ import * as SecureStore from 'expo-secure-store';
 
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+//dit is zegmaar een toggle zodat we jwt in 1 keer aan kunnen zetten wanneer we dat wille jatoch
+export const USE_JWT = false;
+
 export async function storeToken(token) {
-    await SecureStore.setItemAsync('jwt_token', token);
+    if (USE_JWT && token) {
+        await SecureStore.setItemAsync('jwt_token', token);
+    }
 }
 
 export async function getToken() {
+    if (!USE_JWT) return null;
     return await SecureStore.getItemAsync('jwt_token');
 }
 
@@ -16,31 +22,35 @@ export async function removeToken() {
 }
 
 export async function fetchAPI(endpoint, method = 'GET', body) {
-    // We halen eerst de taal op uit de opslag.
-    // Als er niets is opgeslagen, vallen we terug op 'en'.
     let savedLanguage = 'en';
     try {
         const lang = await AsyncStorage.getItem('userLanguage');
         if (lang) {
             savedLanguage = lang;
+            console.log(`[FetchAPI] Language: ${savedLanguage}`);
         }
     } catch (e) {
-        console.error("Fetch service: Error getting language from storage", e);
+        console.error("Language load error:", e);
     }
 
-    const token = await getToken();
     const headers = {
         "Accept": "application/json",
         "Accept-Language": savedLanguage
     };
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+    if (USE_JWT) {
+        const token = await getToken();
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
     }
 
     if ((method === 'POST' || method === 'PUT') && !(body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
+
+    console.log(`[FetchAPI] ${method} -> ${endpoint}`);
+    console.log(`[FetchAPI] Headers:`, headers);
 
     try {
         const baseUrl = EXPO_PUBLIC_API_URL.endsWith('/') ? EXPO_PUBLIC_API_URL : `${EXPO_PUBLIC_API_URL}/`;
@@ -48,10 +58,6 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
         const url = `${baseUrl}${cleanEndpoint}`;
 
         const res = await fetch(url, {
-        // De handmatige vertraging van 2 seconden voor de Pip-loader
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        const res = await fetch(`${EXPO_PUBLIC_API_URL}${endpoint}`, {
             method,
             headers,
             body: body ? JSON.stringify(body) : null
@@ -59,32 +65,32 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
 
         if (res.status === 204) return null;
 
-        const data = await res.json();
-
-        if (res.status === 401) {
-            // If unauthorized, remove the token
-            await removeToken();
-            // Check if the backend provided a specific error message, otherwise fallback to "Unauthorized"
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const textError = await res.text();
+            console.error(`[Fetch Error] Non-JSON response at ${url}. Status: ${res.status}`);
             return {
-                error: data.message || data.error || 'Unauthorized',
-                status: 401
-            };
-        }
-
-        if (!res.ok) {
-            return {
-                error: data.message || data.error || `Error ${res.status}`,
+                error: `Server error (${res.status}). Check backend connectivity.`,
                 status: res.status
             };
         }
 
+        const data = await res.json();
+
+        if (USE_JWT && res.status === 401) {
+            await removeToken();
+            return { error: data.message || 'Unauthorized', status: 401 };
+        }
+
+        if (!res.ok) {
+            return { error: data.message || data.error || `Error ${res.status}`, status: res.status };
+        }
+
         return data;
     } catch (e) {
-        // Technische error log blijft in het Engels
-        console.error("API Fetch Error:", e);
         return {
-            error: "Something went wrong! Please try again later!",
-            stack: e.stack
+            error: "Network error. Check your connection.",
+            stack: e.message
         };
     }
 }

@@ -42,7 +42,10 @@ export const PipMessages = {
             showLessons: "Show lessons",
             startLesson: "Start lesson",
             hamsterverse: "Hamsterverse",
-            home: "Home"
+            home: "Home",
+            close: "Close",
+            applyLanguage: "Choose this language",
+            restartWarning: "The app will restart to fully apply the changes.",
         },
         loading: {
             title: "Loading",
@@ -96,7 +99,9 @@ export const PipMessages = {
             showLessons: "Toon lessen",
             startLesson: "Start les",
             hamsterverse: "Hamsterverse",
-            home: "Home"
+            home: "Home",
+            close: "Sluiten", applyLanguage: "Kies deze taal",
+            restartWarning: "De app wordt opnieuw opgestart om de wijzigingen volledig toe te passen.",
         },
         loading: {
             title: "Laden",
@@ -150,7 +155,10 @@ export const PipMessages = {
             showLessons: "Peep peep",
             startLesson: "Peep peep",
             hamsterverse: "Peep peep",
-            home: "Peep"
+            home: "Peep",
+            close: "Peep",
+            applyLanguage: "Peep peep peep",
+            restartWarning: "Peep peep peep peep peep peep peep peep.",
         },
         loading: {
             title: "Peep",
