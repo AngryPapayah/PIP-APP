@@ -112,13 +112,13 @@ export default function HamsterverseScreen() {
             </View>
 
             <CopilotStep name="Hamsterverse" order={5}
-                         text="Welcome to the Hamsterverse. Pips habitat and the place where you will find your rewards after succesfully completing a lesson.">
+                         text="Welcome to the Hamsterverse. This is Pip’s habitat, where you can view and collect rewards earned by successfully completing lessons.">
                 <CopilotView>
                 </CopilotView>
             </CopilotStep>
 
             <CopilotStep name="EndText" order={6}
-                         text="This was your introduction to P.I.P. Let's get started on your first lesson.">
+                         text="This concludes your introduction to P.I.P. You're now ready to begin your first lesson.">
                 <CopilotView>
                 </CopilotView>
             </CopilotStep>

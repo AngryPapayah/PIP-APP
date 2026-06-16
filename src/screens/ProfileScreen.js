@@ -80,14 +80,14 @@ export default function ProfileScreen() {
     return (
         <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
             <CopilotStep name="ProfileText" order={3}
-                         text="This is your profile page. Here you can find your profile and personal information.">
+                         text="This is your profile page. Here, you can find your profile details and personal information.">
                 <CopilotView>
                     <Text style={styles.title}>Profile</Text>
                 </CopilotView>
             </CopilotStep>
 
             <CopilotStep name="ProfileXP" order={4}
-                         text="You can also see what your current level is and how many XP you have earned through taking your lessons.">
+                         text="You can also see your current level and how much XP you've earned as you complete lessons.">
                 <CopilotView>
                     <View style={styles.xpCard}>
                         <XPBar currentXP={currentXP} level={level}/>

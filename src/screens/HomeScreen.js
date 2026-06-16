@@ -61,14 +61,14 @@ export default function HomeScreen() {
     return (
         <View style={styles.container} onLayout={() => setIsLayoutReady(true)}>
             <CopilotStep name="WelcomeText" order={1}
-                         text="Welcome to your dashboard. Here you have an overview of the modules which you can learn from with different digital categories.">
+                         text="Welcome to your dashboard. Here, you'll find an overview of the learning modules available across a range of digital categories.">
                 <CopilotView>
                     <Text style={styles.text}>Your Modules</Text>
                 </CopilotView>
             </CopilotStep>
 
             <CopilotStep name="ModulesList" order={2}
-                         text="These are your learningmodules. Press on a module to pick out a lesson to strengthen your digital knowledge.">
+                         text="These are your learning modules. Select a module to choose a lesson and strengthen your digital knowledge.">
                 <CopilotView>
                     <ModulesList></ModulesList>
                 </CopilotView>
