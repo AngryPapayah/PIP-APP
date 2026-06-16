@@ -42,8 +42,27 @@ export const AuthProvider = ({children}) => {
         }
     };
 
+    //onboarding
+    const updateUser = async (updatedFields) => {
+        try {
+            setUser((prevUser) => {
+                if (!prevUser) return null;
+
+                const newUser = {...prevUser, ...updatedFields};
+                AsyncStorage.setItem('user', JSON.stringify(newUser)).catch(err =>
+                    console.error("Failed to sync updated user to AsyncStorage", err)
+                );
+
+                return newUser;
+            });
+        } catch (e) {
+            console.error("Failed to update user state", e);
+        }
+    };
+
+
     return (
-        <AuthContext.Provider value={{user, login, logout, loading}}>
+        <AuthContext.Provider value={{user, login, logout, loading, updateUser}}>
             {children}
         </AuthContext.Provider>
     );
