@@ -15,6 +15,8 @@ import {globalStyles, colors} from "../styles/GlobalStyles";
 import TextBubble from "../components/TextBubble";
 import {fetchAPI} from "../services/Fetch";
 import {useAuth} from "../contexts/AuthContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const conversation = [
     "Welcome to P.I.P.",
@@ -48,26 +50,40 @@ export default function LoginScreen({navigation}) {
             setErrorMessage('Please fill in all fields.');
             return;
         }
+
         setLoading(true);
         setErrorMessage('');
 
         try {
-            const data = await fetchAPI('login', 'POST', {email, password});
+            const data = await fetchAPI('login', 'POST', {
+                email,
+                password
+            });
+            console.log(JSON.stringify(data, null, 2));
 
-            if (data.error) {
-                setErrorMessage(data.error);
-            } else {
-                // Store user data in context
-                console.log('Login successful:', data);
-                login(data.data.user); // Store user data.
+            if (!data.success) {
+                setErrorMessage(
+                    data.message || data.error || 'Login failed'
+                );
+                return;
             }
+
+            console.log('Login successful:', data);
+
+            await login(
+                data.data.user,
+                data.data.token
+            );
+
         } catch (error) {
-            setErrorMessage('An unexpected error occurred. Please try again.');
+            console.error(error);
+            setErrorMessage(
+                'An unexpected error occurred. Please try again.'
+            );
         } finally {
             setLoading(false);
         }
     };
-
     const handleRegister = () => {
         navigation.navigate('Signup');
     };
