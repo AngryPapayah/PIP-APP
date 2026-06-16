@@ -1,15 +1,16 @@
-import {StyleSheet, View} from "react-native";
-import {Card} from "../../../../components/Card";
-import {useNavigation} from "@react-navigation/native";
-import {useEffect, useState} from "react";
-import {fetchAPI} from "../../../../services/Fetch";
-import {useAuth} from "../../../../contexts/AuthContext";
+import { StyleSheet, View } from "react-native";
+import { Card } from "../../../../components/Card";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { fetchAPI } from "../../../../services/Fetch";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { useLanguage } from "../../../../contexts/LanguageContext";
 
-export default function LessonsListItem({lesson, moduleId}) {
-
-    const navigation = useNavigation()
-    const {user} = useAuth()
-    const [isPassed, setIsPassed] = useState(false)
+export default function LessonsListItem({ lesson, moduleId }) {
+    const navigation = useNavigation();
+    const { user } = useAuth();
+    const { t } = useLanguage();
+    const [isPassed, setIsPassed] = useState(false);
 
     useEffect(() => {
         if (lesson?.id && user?.id) {
@@ -24,32 +25,33 @@ export default function LessonsListItem({lesson, moduleId}) {
                 "GET"
             );
 
-            console.log("ATTEMPTS RESPONSE:", response);
-
             const hasPassedAttempt = response?.attempts?.some(
                 attempt => attempt.passed === true
             );
 
             setIsPassed(hasPassedAttempt);
         } catch (error) {
-            console.error("Er is een fout opgetreden", error);
+            console.error("An error occurred while checking progress:", error);
         }
     }
 
     return (
         <View style={styles.container}>
-            <Card iconName={isPassed ? "checkmark-circle" : "eye"} lessonTitle={lesson.title}
-                  estimated_time={`Estimated minutes: ${lesson.estimated_minutes}`}
-                  description={lesson.description} buttonText={"Start lesson"}
-                  onPress={() => navigation.navigate("Questions", {moduleId, lessonId: lesson.id})}></Card>
+            <Card
+                iconName={isPassed ? "checkmark-circle" : "eye"}
+                lessonTitle={lesson.title}
+                estimated_time={`Estimated minutes: ${lesson.estimated_minutes}`}
+                description={lesson.description}
+                buttonText={t.ui.startLesson}
+                onPress={() => navigation.navigate("QuestionsScreen", { moduleId, lessonId: lesson.id })}
+            />
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
-
     },
 });

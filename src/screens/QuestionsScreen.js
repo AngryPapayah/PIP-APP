@@ -1,212 +1,155 @@
 import MultipleChoice from "../components/MultipleChoice";
-import {useNavigation, useRoute} from "@react-navigation/native";
-import {useEffect, useState} from "react";
-import {SafeAreaView, StyleSheet, Text} from "react-native";
-import {colors} from "../styles/GlobalStyles";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { SafeAreaView, StyleSheet, Text, Alert, View } from "react-native";
+import { colors } from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
-import {fetchAPI} from "../services/Fetch";
+import { fetchAPI } from "../services/Fetch";
 import ProgressBar from "../components/ProgressBar";
-import {useAuth} from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useLoading } from "../contexts/LoadingContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function QuestionsScreen() {
-
     const route = useRoute();
     const navigation = useNavigation();
-    const {user} = useAuth(); // Get user from AuthContext
-    const {moduleId, lessonId} = route.params;
+    const { user } = useAuth();
+    const { setLoading } = useLoading();
+    const { t } = useLanguage();
+    const { moduleId, lessonId } = route.params;
 
     const [questions, setQuestions] = useState([]);
-    const [attemptId, setAttemptId] = useState(null)
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [loading, setLoading] = useState(true)
-    const [score, setScore] = useState(0); // State to track score
+    const [attemptId, setAttemptId] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [localScore, setLocalScore] = useState(0);
 
-    // Use the user's ID from the context
     const userId = user?.id;
 
-
     useEffect(() => {
-        // Make sure we have a userId before fetching questions
-        if (userId) {
-            getQuestions()
-        }
-    }, [moduleId, lessonId, userId])
+        if (userId) getQuestions();
+    }, [moduleId, lessonId, userId]);
 
     async function getQuestions() {
-        setLoading(true)
+        setLoading(true);
         try {
-
-            let currentAttemptId = attemptId;
-
-            //start the lesson and save the attempt id
-            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', {
-                userId: userId
-            })
-            console.log("START DATA:", JSON.stringify(startData, null, 2));
-
+            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', { userId });
             if (startData && startData.error) {
-                console.error("API Error:", startData.error);
-                setLoading(false);
+                Alert.alert(t.ui.error, startData.error);
                 return;
             }
+            const aid = startData?.attemptId || startData?.data?.attemptId;
+            setAttemptId(aid);
 
-            currentAttemptId = startData.attemptId
-            setAttemptId(currentAttemptId)
-            console.log("Nieuw Attempt ID aangemaakt door backend:", startData.attemptId);
-
-            //get the questions from the lesson
-            const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
-
+            const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET');
             if (questionData && questionData.error) {
-                console.error("API Error:", questionData.error);
-                setLoading(false);
+                Alert.alert(t.ui.error, questionData.error);
                 return;
             }
 
+            const actualQuestions = Array.isArray(questionData) ? questionData : (questionData?.data || []);
 
-            //get per question the belonging answers
-            const fullQuestions = await Promise.all(
-                questionData.map(async (question) => {
+            if (actualQuestions.length > 0) {
+                const fullQuestions = await Promise.all(
+                    actualQuestions.map(async (question) => {
+                        const answerData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET');
 
-                    const answerData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET')
+                        let extractedAnswers = [];
+                        const rawAnswers = answerData?.answers || answerData?.data?.answers || answerData?.data || answerData;
 
-                    if (answerData && answerData.error) {
-                        console.error("API Error:", answerData.error);
-                        setLoading(false);
-                        return;
-                    }
+                        if (Array.isArray(rawAnswers)) {
+                            extractedAnswers = rawAnswers;
+                        }
 
-                    console.log("DIT GEEFT DE ANTWOORDEN API TERUG:", answerData);
-                    //return the question and attach the associated answers array
-                    return {...question, answers: answerData.answers}
-                })
-            )
-
-            // Shuffle the questions array to randomize the order
-            const shuffledQuestions = [...fullQuestions].sort(() => Math.random() - 0.5);
-
-            setQuestions(shuffledQuestions)
-            setLoading(false)
-
-
+                        return { ...question, answers: extractedAnswers };
+                    })
+                );
+                setQuestions(fullQuestions.sort(() => Math.random() - 0.5));
+            } else {
+                Alert.alert(t.ui.error, t.errors.noQuestions);
+            }
         } catch (error) {
-            console.error("Er is een fout opgetreden", error);
-
+            Alert.alert(t.ui.error, t.errors.generic);
+        } finally {
+            setLoading(false);
         }
     }
 
-    //to navigate to the next question or end the lesson
-    async function handleNext(isCorrect) {
-        const newScore = score + (isCorrect ? 10 : 0);
-        if (isCorrect) {
-            setScore(newScore);
+    async function handleNext(isCorrect, selectedAnswerId) {
+        const currentQuestion = questions[currentIndex];
+        if (!attemptId || !currentQuestion) {
+            Alert.alert(t.ui.error, "Data ontbreekt.");
+            return;
         }
 
-        const isLast = currentIndex >= questions.length - 1;
+        setLoading(true);
+        try {
+            const answerSubmissionRes = await fetchAPI(`progress/attempts/${attemptId}/answers`, 'POST', {
+                questionId: currentQuestion.id,
+                answerId: selectedAnswerId
+            });
 
-        if (isLast) {
-            try {
-                // Les afronden
-                await fetchAPI(
-                    `progress/attempts/${attemptId}/complete`,
-                    'POST',
-                    {
-                        userId: userId
-                    }
-                );
-                console.log("Lesson completed");
-
-                // XP
-                const xpResponse = await fetchAPI(
-                    'progress/xp',
-                    'POST',
-                    {
-                        userId: userId,
-                        activityType: 'quiz_completed',
-                        activityId: `lesson_${lessonId}`,
-                        xpAmount: newScore
-                    }
-                );
-                console.log("XP RESPONSE:", xpResponse);
-
-                // Controle
-                const updatedUser = await fetchAPI(
-                    `users/${userId}`,
-                    'GET'
-                );
-                console.log("UPDATED USER:", updatedUser);
-
-            } catch (error) {
-                console.error(
-                    "Er is een fout opgetreden bij het voltooien van de les:",
-                    error
-                );
-            } finally {
-                navigation.navigate("ResultScreen", {
-                    score: newScore
-                });
-            }
-        } else {
             if (isCorrect) {
-                setScore(newScore);
+                setLocalScore(prevScore => prevScore + 10);
             }
-            setCurrentIndex(currentIndex + 1);
+
+            const isLast = currentIndex >= questions.length - 1;
+
+            if (isLast) {
+                const completeRes = await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId });
+                const finalScore = completeRes?.score || localScore;
+
+                await fetchAPI('progress/xp', 'POST', {
+                    userId,
+                    activityType: 'quiz_completed',
+                    activityId: `lesson_${lessonId}`,
+                    xpAmount: finalScore
+                });
+
+                navigation.navigate("ResultScreen", { attemptId, lessonId, score: finalScore });
+            } else {
+                setCurrentIndex(prev => prev + 1);
+            }
+        } catch (error) {
+            if (currentIndex >= questions.length - 1) {
+                navigation.navigate("ResultScreen", { score: localScore });
+            } else {
+                setCurrentIndex(prev => prev + 1);
+            }
+        } finally {
+            setLoading(false);
         }
     }
 
-    // Show a message if the user is not logged in
-    if (!userId) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text>Please log in to view questions.</Text>
-            </SafeAreaView>
-        )
-    }
+    if (!userId) return <View style={styles.container}><Text>{t.errors.loginRequired}</Text></View>;
+    if (questions.length === 0 && !attemptId) return null;
+    if (questions.length === 0) return <View style={styles.container}><Text>{t.errors.noQuestions}</Text></View>;
 
-    //temporary loading screen
-    if (loading || !attemptId) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text>Questions are loading...</Text>
-            </SafeAreaView>
-        )
-    }
-
-    //fallback if api list is empty
-    if (questions.length === 0) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <Text>No questions found for this lesson</Text>
-            </SafeAreaView>
-        )
-    }
-
-    //select active question based on the current index
     const currentQuestion = questions[currentIndex];
-    const isLastQuestion = currentIndex === questions.length - 1;
 
     return (
         <SafeAreaView style={styles.container}>
-            {/*progress visualisation*/}
-            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
-
-            {/*rendering component based on question type*/}
-            {currentQuestion?.question_type === "multiple_choice" ? (
-                <MultipleChoice question={currentQuestion} attemptId={attemptId} onNext={handleNext}
-                                isLastQuestion={isLastQuestion}></MultipleChoice>
+            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length} />
+            {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
+                <MultipleChoice
+                    question={currentQuestion}
+                    onNext={handleNext}
+                    isLastQuestion={currentIndex === questions.length - 1}
+                />
             ) : (
-                <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext}
-                           isLastQuestion={isLastQuestion}></SwipeCard>
+                <SwipeCard
+                    question={currentQuestion}
+                    onNext={handleNext}
+                    isLastQuestion={currentIndex === questions.length - 1}
+                />
             )}
         </SafeAreaView>
-    )
-
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         padding: 10,
         flex: 1,
-        backgroundColor: colors?.primary || '#FFDFAD',
+        backgroundColor: colors?.primary || '#FFDFAD'
     }
 });
