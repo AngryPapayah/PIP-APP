@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, ScrollView} from 'react-native';
 import {globalStyles, colors} from '../styles/GlobalStyles';
 import {useAuth} from '../contexts/AuthContext';
 import XPBar from '../components/XPBar';
+import {fetchAPI} from "../services/Fetch";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience'];
 
@@ -10,10 +12,60 @@ const labelMap = {
     Digital_skill_level: 'Digital skill level',
 };
 
-export default function ProfileScreen() {
-    const { logout, user } = useAuth();
+// Checkt of een datum (van de backend) vandaag is
+function isToday(dateString) {
+    if (!dateString) return false;
+    const d = new Date(dateString);
+    const today = new Date();
+    return d.getFullYear() === today.getFullYear()
+        && d.getMonth() === today.getMonth()
+        && d.getDate() === today.getDate();
+}
 
-    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? 0;
+export default function ProfileScreen() {
+    const {logout, user} = useAuth();
+    const [streak, setStreak] = useState(null);
+
+    useEffect(() => {
+        console.log("User object in profile:", user);
+        if (user?.id) {
+            getStreak()
+        }
+    }, [user]);
+
+    // Streak functie
+    async function getStreak() {
+        try {
+            // console.log(`Fetching streak from: users/${user.id}/streak`);
+            const data = await fetchAPI(`users/${user.id}/streak`, 'GET')
+            // console.log("Streak API response:", data);
+
+            if (data && !data.error && data.status !== 404) {
+                const streakData = data.data || data;
+                const result = Array.isArray(streakData) ? (streakData[0] || {}) : (streakData || {});
+
+                // Backend telt dag 1 nog als streak 0 ("startpunt"). Tot dat is aangepast,
+                // tonen we 'm hier al als 1 -- maar alleen als de gebruiker vandaag echt
+                // actief was. Is last_active_date ouder dan vandaag, dan is de streak
+                // gewoon verbroken en moet 0 ook 0 blijven.
+                const justStartedToday = result.current_streak === 0 && isToday(result.last_active_date);
+
+                setStreak({
+                    ...result,
+                    current_streak: justStartedToday ? 1 : (result.current_streak || 0),
+                    highest_streak: result.highest_streak || 0,
+                });
+            } else {
+                // console.error("Could not fetch streak, backend might be down or endpoint is wrong. Setting to 0.", data?.error);
+                setStreak({current_streak: 0, highest_streak: 0});
+            }
+        } catch (error) {
+            // console.error("An error occurred while fetching the streak", error);
+            setStreak({current_streak: 0, highest_streak: 0});
+        }
+    }
+
+    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? user?.experience ?? 0;
     const level = Math.floor(xp / 100) + 1;
     const currentXP = xp % 100;
 
@@ -33,8 +85,22 @@ export default function ProfileScreen() {
             <Text style={globalStyles?.text || styles.title}>Profile</Text>
 
             <View style={styles.xpCard}>
-                <XPBar currentXP={currentXP} level={level} />
+                <XPBar currentXP={currentXP} level={level}/>
             </View>
+
+            {streak && (
+                <View style={[styles.card, styles.streakContainer]}>
+                    <Icon name="fire" size={24} color="#FFA500" style={styles.streakIcon}/>
+                    <View>
+                        <Text style={styles.streakText}>
+                            Streak: {streak?.current_streak || 0} {(streak?.current_streak === 1) ? 'day' : 'days'}
+                        </Text>
+                        <Text style={styles.highestStreakText}>
+                            Highest: {streak?.highest_streak || 0}
+                        </Text>
+                    </View>
+                </View>
+            )}
 
             {user && (
                 <View style={styles.card}>
@@ -80,6 +146,23 @@ const styles = StyleSheet.create({
         marginBottom: 25,
         borderWidth: 2,
         borderColor: colors?.accent || '#784F4E',
+    },
+    streakContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors?.secondary || '#FFFFFF',
+    },
+    streakIcon: {
+        marginRight: 10,
+    },
+    streakText: {
+        color: colors?.textMain || '#141414',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    highestStreakText: {
+        color: colors?.textMain || '#141414',
+        fontSize: 12,
     },
     row: {
         marginBottom: 14,
