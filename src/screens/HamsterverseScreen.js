@@ -52,7 +52,7 @@ export default function HamsterverseScreen() {
 
             if (user?.id) {
                 try {
-                    const result = await fetchAPI(`users/${user.id}`, "PUT", {on_boarding: 1})
+                    const result = await fetchAPI(`users/${user.id}/complete-onboarding`, "POST", {on_boarding: 1})
                     if (result && result.error) {
                         console.error("Server update failed:", result.error);
                     } else {
