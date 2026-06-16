@@ -24,9 +24,6 @@
     },
     "web": {
       "favicon": "./public/images/pip-head.png"
-    },
-    "plugins": [
-      "expo-secure-store"
-    ]
+    }
   }
 }
