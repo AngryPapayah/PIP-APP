@@ -16,16 +16,21 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
             disabled && {opacity: 0.3},
             style
         ]}>
-            <Text style={[styles.buttonText, variant === "questionButton" && {color: '#000'}]}>{children}</Text>
+            <Text style={[
+                styles.buttonText,
+                variant === "questionButton" && {color: '#000'},
+                isRightAnswer && {color: '#0700db'},
+                isWrongAnswer && {color: '#000f01'}
+            ]}>{children}</Text>
 
             {isRightAnswer && (
-                <View style={styles.iconContainer}>
+                <View accessible={true} style={styles.iconContainer} accessibilityLabel={"Correct awnser"}>
                     <Ionicons name="thumbs-up" size={18} color={'#047053'}></Ionicons>
                 </View>
             )}
 
             {isWrongAnswer && (
-                <View style={styles.iconContainer}>
+                <View accessible={true} style={styles.iconContainer} accessibilityLabel={"Wrong awnser"}>
                     <Ionicons name="thumbs-down" size={18} color={'#802636'}></Ionicons>
                 </View>
             )}
@@ -77,7 +82,7 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: globalStyles?.text.fontSize || 18,
         textAlign: 'center',
-        color: '#FFFFFF',
+        color: '#0d0d0d',
         fontWeight: 'bold'
     },
     iconContainer: {

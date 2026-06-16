@@ -12,6 +12,17 @@ const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience', 'XP
 const labelMap = {
     Digital_skill_level: 'Digital skill level',
 };
+import React from 'react';
+import {StyleSheet, Text, View, TouchableOpacity, ScrollView} from 'react-native';
+import {globalStyles, colors} from '../styles/GlobalStyles';
+import {useAuth} from '../contexts/AuthContext';
+import XPBar from '../components/XPBar';
+
+const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience'];
+
+const labelMap = {
+    Digital_skill_level: 'Digital skill level',
+};
 
 export default function ProfileScreen() {
     const { logout, user } = useAuth();
@@ -31,6 +42,21 @@ export default function ProfileScreen() {
         return String(value);
     };
 
+    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? 0;
+    const level = Math.floor(xp / 100) + 1;
+    const currentXP = xp % 100;
+
+    const formatLabel = (key) => {
+        if (labelMap[key]) return labelMap[key];
+        return key.replace(/_/g, ' ');
+    };
+
+    const renderValue = (value) => {
+        if (value === null || value === undefined) return '-';
+        if (typeof value === 'object') return JSON.stringify(value, null, 2);
+        return String(value);
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             <Text style={[globalStyles?.text || styles.title, { color: colors.textMain }]}>
@@ -39,6 +65,13 @@ export default function ProfileScreen() {
 
             <View style={styles.xpCard}>
                 <XPBar />
+            </View>
+
+        <ScrollView contentContainerStyle={styles.container}>
+            <Text style={globalStyles?.text || styles.title}>Profile</Text>
+
+            <View style={styles.xpCard}>
+                <XPBar currentXP={currentXP} level={level} />
             </View>
 
             {user && (
@@ -58,6 +91,16 @@ export default function ProfileScreen() {
                             </View>
                         ))}
                 </View>
+                <View style={styles.card}>
+                    {Object.entries(user)
+                        .filter(([key]) => !hiddenFields.includes(key))
+                        .map(([key, value]) => (
+                            <View key={key} style={styles.row}>
+                                <Text style={styles.label}>{formatLabel(key)}</Text>
+                                <Text style={styles.value}>{renderValue(value)}</Text>
+                            </View>
+                        ))}
+                </View>
             )}
 
             <TouchableOpacity
@@ -70,6 +113,7 @@ export default function ProfileScreen() {
             <TouchableOpacity style={styles.logoutButton} onPress={logout}>
                 <Text style={styles.logoutButtonText}>{t.ui.signOut}</Text>
             </TouchableOpacity>
+        </ScrollView>
 
             <Modal
                 animationType="slide"
@@ -88,17 +132,52 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flexGrow: 1, backgroundColor: colors?.primary || '#FFDFAD', padding: 20, alignItems: 'center', paddingBottom: 40 },
-    title: { fontSize: 32, fontWeight: 'bold', marginVertical: 20 },
-    xpCard: { width: '100%', marginBottom: 20, backgroundColor: '#fff', borderRadius: 15, paddingVertical: 10, elevation: 3 },
-    card: { width: '100%', backgroundColor: '#fff', borderRadius: 15, padding: 20, marginBottom: 25, borderWidth: 2, borderColor: colors?.accent || '#784F4E' },
-    row: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
-    label: { fontSize: 12, fontWeight: 'bold', color: '#888', textTransform: 'uppercase' },
-    value: { fontSize: 18, color: colors?.textMain || '#333', marginTop: 4, fontWeight: '600' },
-    settingsButton: { backgroundColor: colors?.primaryButton || '#D97706', paddingVertical: 15, paddingHorizontal: 40, borderRadius: 12, width: '100%', alignItems: 'center', marginBottom: 12 },
-    settingsButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-    logoutButton: { backgroundColor: colors?.error || '#FF3B3B', paddingVertical: 15, paddingHorizontal: 40, borderRadius: 12, width: '100%', alignItems: 'center' },
-    logoutButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)' },
-    modalContent: { backgroundColor: '#FFFFFF', borderRadius: 25, padding: 25, width: '85%', elevation: 10, borderWidth: 2, borderColor: colors.primary }
+    container: {
+        flexGrow: 1,
+        backgroundColor: colors?.primary || '#fff',
+        padding: 20,
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    xpCard: {
+        width: '100%',
+        marginBottom: 20,
+    },
+    card: {
+        width: '100%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 25,
+        borderWidth: 2,
+        borderColor: colors?.accent || '#784F4E',
+    },
+    row: {
+        marginBottom: 14,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: colors?.textMain || '#333',
+    },
+    value: {
+        fontSize: 16,
+        color: colors?.textMain || '#333',
+        marginTop: 4,
+    },
+    logoutButton: {
+        backgroundColor: colors?.error || '#FF3B3B',
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        borderRadius: 8,
+    },
+    logoutButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 });

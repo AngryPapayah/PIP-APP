@@ -60,20 +60,65 @@ export default function QuestionsScreen() {
     }
 
     async function handleNext(isCorrect) {
+        const newScore = score + (isCorrect ? 10 : 0);
+        if (isCorrect) {
+            setScore(newScore);
+        }
+
         if (isCorrect) setScore(prevScore => prevScore + 10);
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
             setLoading(true);
             try {
+                // Les afronden
+                await fetchAPI(
+                    `progress/attempts/${attemptId}/complete`,
+                    'POST',
+                    {
+                        userId: userId
+                    }
+                );
+                console.log("Lesson completed");
+
+                // XP
+                const xpResponse = await fetchAPI(
+                    'progress/xp',
+                    'POST',
+                    {
+                        userId: userId,
+                        activityType: 'quiz_completed',
+                        activityId: `lesson_${lessonId}`,
+                        xpAmount: newScore
+                    }
+                );
+                console.log("XP RESPONSE:", xpResponse);
+
+                // Controle
+                const updatedUser = await fetchAPI(
+                    `users/${userId}`,
+                    'GET'
+                );
+                console.log("UPDATED USER:", updatedUser);
+
                 await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId: userId });
                 navigation.navigate("ResultScreen", { attemptId, lessonId, score: score + (isCorrect ? 10 : 0) });
             } catch (error) {
+                console.error(
+                    "Er is een fout opgetreden bij het voltooien van de les:",
+                    error
+                );
                 Alert.alert(t.ui.error, t.errors.finishError);
             } finally {
+                navigation.navigate("ResultScreen", {
+                    score: newScore
+                });
                 setLoading(false);
             }
         } else {
+            if (isCorrect) {
+                setScore(newScore);
+            }
             setCurrentIndex(currentIndex + 1);
         }
     }
