@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, Modal} from 'react-native';
 import {colors} from "../styles/GlobalStyles";
 import {CommonActions} from '@react-navigation/native';
 import XPBar from '../components/XPBar';
@@ -9,6 +9,10 @@ export default function ResultScreen({navigation, route}) {
     // Haal de score op uit de route params (met 0 als fallback)
     const score = route?.params?.score || 0;
     const [refreshXP, setRefreshXP] = useState(0);
+    const [bubbleText, setBubbleText] = useState(`Good job!`);
+    const [showRewardModal, setShowRewardModal] = useState(false);
+    const [newlyUnlockedReward, setNewlyUnlockedReward] = useState(null);
+    const [hasShownLevelUp, setHasShownLevelUp] = useState(false);
 
     // Forceer een refresh van de XPBar na het laden van de result screen
     React.useEffect(() => {
@@ -17,6 +21,40 @@ export default function ResultScreen({navigation, route}) {
         }, 500);
         return () => clearTimeout(timer);
     }, []);
+
+    // Reset hasShownLevelUp wanneer de component mount (nieuwe result screen)
+    React.useEffect(() => {
+        setHasShownLevelUp(false);
+        setBubbleText(`Good job!`);
+    }, []);
+
+    // Bepaal welke reward er is vrijgespeeld op basis van level
+    const getRewardForLevel = (level) => {
+        switch(level) {
+            case 2:
+                return { name: 'Food Bowl', image: require('../../public/images/food.png'), description: 'You unlocked the Food Bowl!' };
+            case 3:
+                return { name: 'Hamster Wheel', image: require('../../public/images/wheel.png'), description: 'You unlocked the Hamster Wheel!' };
+            default:
+                return null;
+        }
+    };
+
+    // Handler for level-up van XPBar
+    const handleLevelUp = (newLevel, oldLevel) => {
+        // Alleen level-up melding tonen als we die nog niet hebben getoond
+        if (!hasShownLevelUp) {
+            setHasShownLevelUp(true);
+            setBubbleText(`Congratulations! You are now level ${newLevel}!`);
+        }
+
+        // Check if there's a reward for this level
+        const reward = getRewardForLevel(newLevel);
+        if (reward) {
+            setNewlyUnlockedReward(reward);
+            setShowRewardModal(true);
+        }
+    };
 
     const goToHome = () => {
         navigation.dispatch(
@@ -37,11 +75,16 @@ export default function ResultScreen({navigation, route}) {
         navigation.navigate('Hamsterverse');
     };
 
+    const closeRewardModal = () => {
+        setShowRewardModal(false);
+        setNewlyUnlockedReward(null);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.characterContainer}>
-                    <TextBubble text="Good job!"/>
+                    <TextBubble text={bubbleText}/>
                     <Image
                         source={require('../../public/images/pip-body.png')}
                         style={styles.characterImage}
@@ -51,7 +94,7 @@ export default function ResultScreen({navigation, route}) {
                 <Text style={styles.scoreText}>Score: {score}</Text>
 
                 <View style={styles.xpBarSection}>
-                    <XPBar refreshTrigger={refreshXP} />
+                    <XPBar refreshTrigger={refreshXP} onLevelUp={handleLevelUp} />
                 </View>
 
                 <TouchableOpacity
@@ -67,6 +110,42 @@ export default function ResultScreen({navigation, route}) {
                     <Text style={styles.buttonText}>Home</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Reward Popup Modal */}
+            <Modal
+                visible={showRewardModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={closeRewardModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.primary || '#F4E1C1' }]}>
+                        <TouchableOpacity style={styles.closeButton} onPress={closeRewardModal}>
+                            <Text style={styles.closeButtonText}>✕</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.rewardContainer}>
+                            <Text style={styles.rewardTitle}>Reward Unlocked!</Text>
+
+                            {newlyUnlockedReward && (
+                                <>
+                                    <Image
+                                        source={newlyUnlockedReward.image}
+                                        style={styles.rewardImage}
+                                        resizeMode="contain"
+                                    />
+                                    <Text style={styles.rewardName}>{newlyUnlockedReward.name}</Text>
+                                    <Text style={styles.rewardDescription}>{newlyUnlockedReward.description}</Text>
+                                </>
+                            )}
+
+                            <Text style={styles.rewardFooter}>
+                                You can see your rewards in the Hamsterverse!
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     )
 }
@@ -74,7 +153,7 @@ export default function ResultScreen({navigation, route}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors?.primary || '#fff',
+        backgroundColor: colors?.primary || '#F4E1C1',
     },
     content: {
         flex: 1,
@@ -95,12 +174,12 @@ const styles = StyleSheet.create({
     scoreText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: colors?.textMain || '#000',
+        color: colors?.textMain || '#141414',
     },
     xpBarSection: {
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: colors?.primary || '#FFDFAD',
+        backgroundColor: colors?.primary || '#F4E1C1',
         width: '100%',
         alignItems: 'center',
     },
@@ -114,8 +193,74 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
-        color: colors.textMain || '#000000',
+        color: colors.textMain || '#141414',
         fontSize: 18,
         fontWeight: 'bold',
-    }
+    },
+    // Modal styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        borderRadius: 25,
+        padding: 24,
+        width: '85%',
+        alignItems: 'center',
+        position: 'relative',
+        backgroundColor: colors?.primary || '#F4E1C1',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1,
+    },
+    closeButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: colors?.textMain || '#141414',
+    },
+    rewardContainer: {
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    rewardTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: colors?.primaryButton || '#D97706',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    rewardImage: {
+        width: 120,
+        height: 120,
+        marginVertical: 16,
+    },
+    rewardName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: colors?.textMain || '#141414',
+        marginBottom: 8,
+    },
+    rewardDescription: {
+        fontSize: 16,
+        color: colors?.textMain || '#141414',
+        textAlign: 'center',
+        marginBottom: 16,
+    },
+    rewardFooter: {
+        fontSize: 14,
+        color: colors?.accent || '#784F4E',
+        textAlign: 'center',
+        marginTop: 12,
+        fontStyle: 'italic',
+    },
 });

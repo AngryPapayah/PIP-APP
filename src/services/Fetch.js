@@ -1,16 +1,39 @@
+import * as SecureStore from 'expo-secure-store';
+
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+export async function storeToken(token) {
+    await SecureStore.setItemAsync('jwt_token', token);
+}
+
+export async function getToken() {
+    return await SecureStore.getItemAsync('jwt_token');
+}
+
+export async function removeToken() {
+    await SecureStore.deleteItemAsync('jwt_token');
+}
+
 export async function fetchAPI(endpoint, method = 'GET', body) {
+    const token = await getToken();
     const headers = {
         "Accept": "application/json"
     };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
 
     if ((method === 'POST' || method === 'PUT') && !(body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
 
     try {
-        const res = await fetch(`${EXPO_PUBLIC_API_URL}${endpoint}`, {
+        const baseUrl = EXPO_PUBLIC_API_URL.endsWith('/') ? EXPO_PUBLIC_API_URL : `${EXPO_PUBLIC_API_URL}/`;
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+        const url = `${baseUrl}${cleanEndpoint}`;
+
+        const res = await fetch(url, {
             method,
             headers,
             body: body ? JSON.stringify(body) : null
@@ -21,6 +44,8 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
         const data = await res.json();
 
         if (res.status === 401) {
+            // If unauthorized, remove the token
+            await removeToken();
             // Check if the backend provided a specific error message, otherwise fallback to "Unauthorized"
             return {
                 error: data.message || data.error || 'Unauthorized', 

@@ -7,19 +7,19 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function XPBar({ onXPChange }) {
+export default function XPBar({ onXPChange, onLevelUp }) {
     const { user } = useAuth();
     const [xp, setXP] = useState(0);
     const [currentLevel, setCurrentLevel] = useState(1);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [totalXP, setTotalXP] = useState(0);
+    const [showArrow, setShowArrow] = useState(false);
     const progressAnim = useRef(new Animated.Value(0)).current;
 
     const XP_PER_LEVEL = 100;
     const MAX_LEVEL = 10;
 
-    // Fetch user data functie
     const fetchUserProgress = async () => {
         if (!user?.id) return;
 
@@ -33,16 +33,12 @@ export default function XPBar({ onXPChange }) {
                 const experience = userData.experience || 0;
 
                 setTotalXP(experience);
-
-                // Formule: Level = TotaalXP/100 + 1
                 const level = Math.floor(experience / 100) + 1;
                 const currentXP = experience % 100;
 
                 setXP(currentXP);
                 setCurrentLevel(Math.min(level, MAX_LEVEL));
-                console.log(`XP Update: Total=${experience}, Level=${level}, CurrentXP=${currentXP}`);
 
-                // Stuur de XP en level door naar de parent component
                 if (onXPChange) {
                     onXPChange({ xp: experience, level: Math.min(level, MAX_LEVEL) });
                 }
@@ -54,19 +50,16 @@ export default function XPBar({ onXPChange }) {
         }
     };
 
-    // Refresh when screen is focused
     useFocusEffect(
         useCallback(() => {
             fetchUserProgress();
         }, [user?.id])
     );
 
-    // Refresh component
     useEffect(() => {
         fetchUserProgress();
     }, [user?.id]);
 
-    // Animation for progress bar
     useEffect(() => {
         const progressValue = Math.min(xp / XP_PER_LEVEL, 1);
         Animated.timing(progressAnim, {
@@ -75,6 +68,21 @@ export default function XPBar({ onXPChange }) {
             useNativeDriver: false,
         }).start();
     }, [xp]);
+
+    const prevLevelRef = useRef(currentLevel);
+
+    useEffect(() => {
+        if (prevLevelRef.current !== currentLevel && currentLevel > prevLevelRef.current) {
+            // Level up detected!
+            setShowArrow(true);
+            setTimeout(() => setShowArrow(false), 3000); // Pijl na 3 sec verbergen
+
+            if (onLevelUp) {
+                onLevelUp(currentLevel, prevLevelRef.current);
+            }
+            prevLevelRef.current = currentLevel;
+        }
+    }, [currentLevel]);
 
     const barWidth = screenWidth - 80;
     const animatedWidth = progressAnim.interpolate({
@@ -106,7 +114,9 @@ export default function XPBar({ onXPChange }) {
             <TouchableOpacity activeOpacity={0.7} onPress={() => setShowModal(true)}>
                 <View style={styles.container}>
                     <View style={styles.levelBadge}>
-                        <Text style={styles.levelBadgeText}>LEVEL {currentLevel}</Text>
+                        <Text style={styles.levelBadgeText}>
+                            LEVEL {currentLevel} {showArrow && '🡹'}
+                        </Text>
                     </View>
 
                     <View style={styles.barWrapper}>
@@ -164,6 +174,7 @@ export default function XPBar({ onXPChange }) {
     );
 }
 
+// Styles blijven hetzelfde
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
