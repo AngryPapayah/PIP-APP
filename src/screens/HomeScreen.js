@@ -21,41 +21,38 @@ export default function HomeScreen() {
     const [isLayoutReady, setIsLayoutReady] = useState(false);
 
     //onboarding
-    useEffect(() => {
-        // console.log("Check: Is user ingelogd?", user);
-        // console.log("Check: Onboarding status van user:", user?.on_boarding);
-        // console.log("Check: startTour vlag aanwezig?", user?.startTour);
+    if (user?.on_boarding === 0) {
+        useEffect(() => {
+            // console.log("Check: Is user ingelogd?", user);
+            // console.log("Check: Onboarding status van user:", user?.on_boarding);
+            // console.log("Check: startTour vlag aanwezig?", user?.startTour);
 
-        if (isLayoutReady && (user?.on_boarding === 0 || user?.startTour === true)) {
+            if (isLayoutReady && (user?.on_boarding === 0 || user?.startTour === true)) {
 
-            const timer = setTimeout(() => {
-                // console.log("LOG: Executing start() NU!");
-                start()
-            }, 600)
+                const timer = setTimeout(() => {
+                    start()
+                }, 600)
+
+                return () => {
+                    clearTimeout(timer)
+                }
+            }
+        }, [isLayoutReady, user]);
+
+        //onboarding
+        useEffect(() => {
+
+            copilotEvents.on('stop', () => {
+                navigation.navigate('Profile', {startTour: true})
+            })
 
             return () => {
-                clearTimeout(timer)
+                copilotEvents.off('start')
+                copilotEvents.off('stop')
             }
-        }
-    }, [isLayoutReady, user]);
+        }, []);
 
-    //onboarding
-    useEffect(() => {
-
-        copilotEvents.on('start', () => {
-            // console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
-        });
-
-        copilotEvents.on('stop', () => {
-            // console.log("Tour op homescreen klaar, naar hamburgermenu")
-            navigation.navigate('Profile', {startTour: true})
-        })
-
-        return () => {
-            copilotEvents.off('start')
-            copilotEvents.off('stop')
-        }
-    }, []);
+    }
 
 
     return (
