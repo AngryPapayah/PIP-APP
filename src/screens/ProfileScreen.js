@@ -1,70 +1,54 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, ScrollView, Modal} from 'react-native';
-import {colors} from '../styles/GlobalStyles';
-import {useAuth} from '../contexts/AuthContext';
-import {useLanguage} from '../contexts/LanguageContext';
+import React, { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { colors } from '../styles/GlobalStyles';
+import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import XPBar from '../components/XPBar';
-import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
-import {useNavigation, useRoute} from "@react-navigation/native";
+import { CopilotStep, useCopilot, walkthroughable } from "react-native-copilot";
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import SettingsScreen from './SettingsScreen';
 
-const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience', 'startTour'];
+const hiddenFields = ['id', 'on_boarding', 'current_level_id', 'experience', 'startTour', 'xp', 'XP', 'experience_points'];
 
-const labelMap = {
-    Digital_skill_level: 'Digital skill level',
-};
-
-//onboarding
-const CopilotView = walkthroughable(({style, children, ...props}) => (
+const CopilotView = walkthroughable(({ style, children, ...props }) => (
     <View style={style} {...props}>{children}</View>
 ));
 
 export default function ProfileScreen() {
-    const { logout, user } = useAuth();
+    const { logout, user, refreshUser } = useAuth();
     const { t } = useLanguage();
     const [showSettingsModal, setShowSettingsModal] = useState(false);
-
-    //onboarding
-    const navigation = useNavigation()
-    const route = useRoute()
-
-    //onboarding
-    const {start, copilotEvents} = useCopilot()
     const [isLayoutReady, setIsLayoutReady] = useState(false);
 
-    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? 0;
-    const level = Math.floor(xp / 100) + 1;
-    const currentXP = xp % 100;
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { start, copilotEvents } = useCopilot();
 
-    //onboarding
+    useFocusEffect(
+        useCallback(() => {
+            refreshUser();
+        }, [refreshUser])
+    );
+
     useEffect(() => {
-        const starting = route?.params?.startTour
-
+        const starting = route?.params?.startTour;
         if (isLayoutReady && starting) {
             const timer = setTimeout(() => {
                 start("ProfileText");
             }, 600);
-
             return () => clearTimeout(timer);
         }
     }, [isLayoutReady, route?.params]);
 
-    //onboarding
     useEffect(() => {
-        copilotEvents.on('start', () => {
-            // console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
-        });
-
         copilotEvents.on('stop', () => {
-            // console.log("Tour op profile klaar, naar hamsterverse")
-            navigation.navigate('Hamsterverse', {startTour: true})
-        })
-
+            navigation.navigate('Hamsterverse', { startTour: true });
+        });
         return () => {
-            copilotEvents.off('start')
-            copilotEvents.off('stop')
-        }
-    }, []);
+            copilotEvents.off('start');
+            copilotEvents.off('stop');
+        };
+    }, [navigation, copilotEvents]);
 
     const formatLabel = (key) => {
         const label = key.replace(/_/g, ' ');
@@ -77,19 +61,15 @@ export default function ProfileScreen() {
             showsVerticalScrollIndicator={false}
             onLayout={() => setIsLayoutReady(true)}
         >
-            <CopilotStep name="ProfileText" order={3}
-                         text="This is your profile page. Here, you can find your profile details and personal information.">
+            <CopilotStep name="ProfileText" order={3} text="Dit is je profielpagina. Hier vind je je persoonlijke gegevens.">
                 <CopilotView>
-                    <Text style={styles.title}>Profile</Text>
+                    <Text style={styles.title}>{t.ui.profile}</Text>
                 </CopilotView>
             </CopilotStep>
 
-            <CopilotStep name="ProfileXP" order={4}
-                         text="You can also see your current level and how much XP you've earned as you complete lessons.">
-                <CopilotView>
-                    <View style={styles.xpCard}>
-                        <XPBar currentXP={currentXP} level={level}/>
-                    </View>
+            <CopilotStep name="ProfileXP" order={4} text="Hier zie je je huidige niveau en de verdiende XP.">
+                <CopilotView style={styles.xpCard}>
+                    <XPBar />
                 </CopilotView>
             </CopilotStep>
 
@@ -126,85 +106,18 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        backgroundColor: colors?.primary || '#F4E1C1',
-        padding: 20,
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-        color: colors.textMain
-    },
-    xpCard: {
-        width: '100%',
-        marginBottom: 20,
-    },
-    card: {
-        width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 15,
-        padding: 20,
-        marginBottom: 25,
-        borderWidth: 2,
-        borderColor: colors?.accent || '#784F4E',
-    },
-    row: {
-        marginVertical: 10,
-    },
-    borderBottom: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        paddingBottom: 10,
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#888',
-        textTransform: 'uppercase',
-    },
-    value: {
-        fontSize: 18,
-        color: colors?.textMain || '#333',
-        marginTop: 2,
-        fontWeight: '500',
-    },
-    settingsButton: {
-        backgroundColor: colors?.secondary || '#E9C46A',
-        paddingVertical: 14,
-        borderRadius: 25,
-        marginBottom: 15,
-        width: '100%',
-        alignItems: 'center',
-    },
-    settingsButtonText: {
-        color: colors?.textMain || '#141414',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    logoutButton: {
-        backgroundColor: colors?.error || '#FF3B3B',
-        paddingVertical: 14,
-        borderRadius: 25,
-        width: '100%',
-        alignItems: 'center',
-    },
-    logoutButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContent: {
-        width: '90%',
-        maxHeight: '80%',
-    }
+    container: { flexGrow: 1, backgroundColor: colors?.primary || '#F4E1C1', padding: 20, alignItems: 'center' },
+    title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: colors.textMain || '#000' },
+    xpCard: { width: '100%', marginBottom: 20 },
+    card: { width: '100%', backgroundColor: '#fff', borderRadius: 15, padding: 20, marginBottom: 25, borderWidth: 2, borderColor: colors?.accent || '#784F4E' },
+    row: { marginVertical: 10 },
+    borderBottom: { borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 10 },
+    label: { fontSize: 12, fontWeight: 'bold', color: '#888', textTransform: 'uppercase' },
+    value: { fontSize: 18, color: colors?.textMain || '#333', marginTop: 2, fontWeight: '500' },
+    settingsButton: { backgroundColor: colors?.secondary || '#E9C46A', paddingVertical: 14, borderRadius: 25, marginBottom: 15, width: '100%', alignItems: 'center' },
+    settingsButtonText: { color: colors?.textMain || '#141414', fontSize: 16, fontWeight: 'bold' },
+    logoutButton: { backgroundColor: colors?.error || '#FF3B3B', paddingVertical: 14, borderRadius: 25, width: '100%', alignItems: 'center' },
+    logoutButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' },
+    modalContent: { width: '90%', maxHeight: '80%' }
 });
