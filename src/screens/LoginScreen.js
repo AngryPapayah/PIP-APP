@@ -3,20 +3,16 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingV
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../styles/GlobalStyles";
 import TextBubble from "../components/TextBubble";
-import { fetchAPI, storeToken, USE_JWT } from "../services/Fetch";
+import { fetchAPI } from "../services/Fetch";
 import { useAuth } from "../contexts/AuthContext";
 import { useLoading } from "../contexts/LoadingContext";
 import { useLanguage } from "../contexts/LanguageContext";
 
-const conversation = [
-    "Welcome to P.I.P.",
-    "Your Parental Informative Program.",
-    "Let's get started!"
-];
+export default function LoginScreen({ navigation }) {
+    const { login } = useAuth();
+    const { setLoading } = useLoading();
+    const { t } = useLanguage();
 
-export default function LoginScreen({navigation}) {
-    const {login} = useAuth();
-    // login
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -35,6 +31,7 @@ export default function LoginScreen({navigation}) {
             setErrorMessage(t.errors.unknownUser);
             return;
         }
+
         setLoading(true);
         setErrorMessage('');
 
@@ -44,23 +41,19 @@ export default function LoginScreen({navigation}) {
             if (response.error) {
                 setErrorMessage(response.error);
             } else {
-                // Store user data in context
-                console.log('Login successful:', data);
-                // login(data.data.user); // Store user data.
+                console.log('Login successful:', response);
 
-                const user = data.data?.user
-                const needsOnboarding = user?.on_boarding === 0
+                const user = response.data?.user;
+                const needsOnboarding = user?.on_boarding === 0;
 
                 if (needsOnboarding) {
-                    user.startTour = true
-                    login(user)
-                } else {
-                    login(user)
+                    user.startTour = true;
                 }
 
-
+                login(user);
             }
         } catch (error) {
+            console.error('Login failed:', error);
             setErrorMessage(t.errors.startled);
         } finally {
             setLoading(false);
@@ -84,12 +77,12 @@ export default function LoginScreen({navigation}) {
                     />
                     <Image
                         source={require('../../public/images/pip-body.png')}
-                        style={{width: 200, height: 200, marginLeft: 15,}}
+                        style={styles.image}
                         resizeMode="contain"
                     />
                     <TextInput
                         style={styles.input}
-                        placeholder="Email"
+                        placeholder={t.ui.email}
                         placeholderTextColor="#888"
                         value={email}
                         onChangeText={setEmail}
@@ -98,7 +91,7 @@ export default function LoginScreen({navigation}) {
                     />
                     <TextInput
                         style={styles.input}
-                        placeholder="Password"
+                        placeholder={t.ui.password} // Use translations for placeholders
                         placeholderTextColor="#888"
                         value={password}
                         onChangeText={setPassword}
@@ -124,8 +117,9 @@ export default function LoginScreen({navigation}) {
 
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: colors?.primary || '#fff' },
+    keyboardAvoidingView: { flex: 1 },
     scrollContainer: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
-    image: { width: 200, height: 200, marginBottom: 10 },
+    image: { width: 200, height: 200, marginLeft: 15, marginBottom: 10 },
     input: { width: '100%', height: 50, backgroundColor: '#f2f2f2', borderRadius: 10, paddingHorizontal: 15, marginBottom: 15, borderWidth: 1, borderColor: '#ddd' },
     button: { width: '100%', height: 50, backgroundColor: colors?.primaryButton || '#F09D67', borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
     buttonText: { color: colors?.textMain || '#000', fontSize: 18, fontWeight: 'bold' },

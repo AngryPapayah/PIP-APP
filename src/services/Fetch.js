@@ -1,27 +1,63 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+//dit is zegmaar een toggle zodat we jwt in 1 keer aan kunnen zetten wanneer we dat wille jatoch
+export const USE_JWT = false;
+
+export async function storeToken(token) {
+    if (token) {
+        await SecureStore.setItemAsync('jwt_token', token);
+    }
+}
+
+export async function getToken() {
+    return await SecureStore.getItemAsync('jwt_token');
+}
+
+export async function removeToken() {
+    await SecureStore.deleteItemAsync('jwt_token');
+}
+
 export async function fetchAPI(endpoint, method = 'GET', body) {
+    let savedLanguage = 'en';
+    try {
+        const lang = await AsyncStorage.getItem('userLanguage');
+        if (lang) {
+            savedLanguage = lang;
+        }
+    } catch (e) {
+        console.error("[FetchAPI] Language load error:", e);
+    }
+
     const headers = {
         "Accept": "application/json",
         "Accept-Language": savedLanguage
     };
 
-    if ((method === 'POST' || method === 'PUT') && !(body instanceof FormData)) {
+    if (USE_JWT) {
+        const token = await getToken();
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+    }
+
+    if ((method === 'POST' || method === 'PUT') && body && !(body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
 
-    console.log(`[FetchAPI] ${method} -> ${endpoint}`);
-    console.log(`[FetchAPI] Headers:`, headers);
+    const baseUrl = EXPO_PUBLIC_API_URL.endsWith('/') ? EXPO_PUBLIC_API_URL : `${EXPO_PUBLIC_API_URL}/`;
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    const url = `${baseUrl}${cleanEndpoint}`;
+
+    console.log(`[FetchAPI] ${method} -> ${url}`);
 
     try {
-        const baseUrl = EXPO_PUBLIC_API_URL.endsWith('/') ? EXPO_PUBLIC_API_URL : `${EXPO_PUBLIC_API_URL}/`;
-        const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-        const url = `${baseUrl}${cleanEndpoint}`;
-
         const res = await fetch(url, {
             method,
             headers,
-            body: body ? JSON.stringify(body) : null
+            body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : null
         });
 
         if (res.status === 204) return null;
@@ -31,19 +67,16 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
             const textError = await res.text();
             console.error(`[Fetch Error] Non-JSON response at ${url}. Status: ${res.status}`);
             return {
-                error: `Server error (${res.status}). Check backend connectivity.`,
+                error: `Server error (${res.status}).`,
                 status: res.status
             };
         }
 
         const data = await res.json();
 
-        if (res.status === 401) {
-            // Check if the backend provided a specific error message, otherwise fallback to "Unauthorized"
-            return {
-                error: data.message || data.error || 'Unauthorized', 
-                status: 401
-            };
+        if (USE_JWT && res.status === 401) {
+            await removeToken();
+            return { error: data.message || 'Unauthorized', status: 401 };
         }
 
         if (!res.ok) {
@@ -52,6 +85,7 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
 
         return data;
     } catch (e) {
+        console.error("[FetchAPI] Network error:", e.message);
         return {
             error: "Network error. Check your connection.",
             stack: e.message

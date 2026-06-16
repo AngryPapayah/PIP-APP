@@ -59,17 +59,17 @@ const AppNavigator = () => {
 
 export default function App() {
     return (
-        <LoadingProvider>  {/* LoadingProvider moet bovenaan staan */}
+        <LoadingProvider>
             <AuthProvider>
-                <CopilotProvider labels={{ previous: "", next: "Next", skip: "Skip", finish: "Finish" }}>
-                    <FilterProvider>
-                        <LanguageProvider>
+                <LanguageProvider>
+                    <CopilotProvider labels={{ previous: "", next: "Next", skip: "Skip", finish: "Finish" }}>
+                        <FilterProvider>
                             <NavigationContainer>
                                 <AppNavigator />
                             </NavigationContainer>
-                        </LanguageProvider>
-                    </FilterProvider>
-                </CopilotProvider>
+                        </FilterProvider>
+                    </CopilotProvider>
+                </LanguageProvider>
             </AuthProvider>
         </LoadingProvider>
     );
