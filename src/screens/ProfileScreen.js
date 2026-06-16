@@ -12,7 +12,7 @@ const labelMap = {
     Digital_skill_level: 'Digital skill level',
 };
 
-//onboarding
+//onboarding process
 const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
 ));

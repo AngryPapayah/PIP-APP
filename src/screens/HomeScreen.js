@@ -6,7 +6,7 @@ import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
 import {useNavigation} from "@react-navigation/native";
 import {useAuth} from "../contexts/AuthContext";
 
-//onboarding
+//onboarding process
 const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
 ))

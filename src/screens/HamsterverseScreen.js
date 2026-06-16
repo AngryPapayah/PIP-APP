@@ -7,7 +7,7 @@ import {useAuth} from "../contexts/AuthContext";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {fetchAPI} from "../services/Fetch";
 
-//onboarding
+//onboarding process
 const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
 ));
