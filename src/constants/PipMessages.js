@@ -16,7 +16,8 @@ export const PipMessages = {
         success: {
             recognised: "Pip will be able to recognise you now.",
             registration: "Registration Successful",
-            goodJob: "Good job!"
+            goodJob: "Good job!",
+            levelUpMessage: "You reached level"
         },
         ui: {
             welcome: "Welcome to P.I.P.",
@@ -54,6 +55,22 @@ export const PipMessages = {
             schizoMode: "Schizo mode",
             adhdMode: "ADHD mode",
             tooMuch: "Too much"
+        },
+        onboarding: {
+            homeWelcomeText: "Welcome to your dashboard. Here, you'll find an overview of the learning modules available across a range of digital categories.",
+            homeModulesText: "These are your learning modules. Select a module to choose a lesson and strengthen your digital knowledge."
+        },
+        rewards: {
+            unlockedTitle: "New Reward Unlocked!",
+            footerNote: "You can find your rewards in the Hamsterverse.",
+            foodBowl: {
+                name: "Food Bowl",
+                description: "A shiny bowl to keep your hamster fed."
+            },
+            hamsterWheel: {
+                name: "Hamster Wheel",
+                description: "Keep your hamster fit and happy with this wheel."
+            }
         }
     },
     nl: {
@@ -73,7 +90,8 @@ export const PipMessages = {
         success: {
             recognised: "Pip kan je nu herkennen.",
             registration: "Registratie geslaagd",
-            goodJob: "Goed gedaan!"
+            goodJob: "Goed gedaan!",
+            levelUpMessage: "Je bent nu niveau"
         },
         ui: {
             welcome: "Welkom bij P.I.P.",
@@ -100,7 +118,8 @@ export const PipMessages = {
             startLesson: "Start les",
             hamsterverse: "Hamsterverse",
             home: "Home",
-            close: "Sluiten", applyLanguage: "Kies deze taal",
+            close: "Sluiten",
+            applyLanguage: "Kies deze taal",
             restartWarning: "De app wordt opnieuw opgestart om de wijzigingen volledig toe te passen.",
         },
         loading: {
@@ -110,6 +129,22 @@ export const PipMessages = {
             schizoMode: "Schizo modus",
             adhdMode: "ADHD modus",
             tooMuch: "Te veel"
+        },
+        onboarding: {
+            homeWelcomeText: "Welkom op je dashboard. Hier vind je een overzicht van alle leermodules in verschillende digitale categorieën.",
+            homeModulesText: "Dit zijn je leermodules. Kies een module om een les te starten en je digitale kennis te vergroten."
+        },
+        rewards: {
+            unlockedTitle: "Nieuwe beloning vrijgespeeld!",
+            footerNote: "Je kunt je beloningen vinden in de Hamsterverse.",
+            foodBowl: {
+                name: "Voerbakje",
+                description: "Een glimmend bakje om je hamster te voeren."
+            },
+            hamsterWheel: {
+                name: "Looprad",
+                description: "Houd je hamster fit en vrolijk met dit looprad."
+            }
         }
     },
     hamster: {
@@ -129,7 +164,8 @@ export const PipMessages = {
         success: {
             recognised: "Peep peep peep peep peep peep.",
             registration: "Peep peep peep",
-            goodJob: "Peep peep!"
+            goodJob: "Peep peep!",
+            levelUpMessage: "Peep peep peep"
         },
         ui: {
             welcome: "Peep peep peep P.I.P.",
@@ -167,6 +203,22 @@ export const PipMessages = {
             schizoMode: "Peep peep peep",
             adhdMode: "Peep peep",
             tooMuch: "PEEP!"
+        },
+        onboarding: {
+            homeWelcomeText: "Peep peep peep peep peep peep.",
+            homeModulesText: "Peep peep peep peep peep peep."
+        },
+        rewards: {
+            unlockedTitle: "Peep peep peep peep!",
+            footerNote: "Peep peep peep peep peep peep.",
+            foodBowl: {
+                name: "Peep peep",
+                description: "Peep peep peep peep peep."
+            },
+            hamsterWheel: {
+                name: "Peep peep",
+                description: "Peep peep peep peep peep."
+            }
         }
     }
 };

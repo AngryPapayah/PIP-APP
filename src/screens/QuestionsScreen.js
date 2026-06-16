@@ -61,64 +61,38 @@ export default function QuestionsScreen() {
 
     async function handleNext(isCorrect) {
         const newScore = score + (isCorrect ? 10 : 0);
-        if (isCorrect) {
-            setScore(newScore);
-        }
-
-        if (isCorrect) setScore(prevScore => prevScore + 10);
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
             setLoading(true);
             try {
-                // Les afronden
-                await fetchAPI(
-                    `progress/attempts/${attemptId}/complete`,
-                    'POST',
-                    {
-                        userId: userId
-                    }
-                );
-                console.log("Lesson completed");
-
-                // XP
-                const xpResponse = await fetchAPI(
-                    'progress/xp',
-                    'POST',
-                    {
-                        userId: userId,
-                        activityType: 'quiz_completed',
-                        activityId: `lesson_${lessonId}`,
-                        xpAmount: newScore
-                    }
-                );
-                console.log("XP RESPONSE:", xpResponse);
-
-                // Controle
-                const updatedUser = await fetchAPI(
-                    `users/${userId}`,
-                    'GET'
-                );
-                console.log("UPDATED USER:", updatedUser);
-
+                // 1. Les afronden
                 await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId: userId });
-                navigation.navigate("ResultScreen", { attemptId, lessonId, score: score + (isCorrect ? 10 : 0) });
-            } catch (error) {
-                console.error(
-                    "Er is een fout opgetreden bij het voltooien van de les:",
-                    error
-                );
-                Alert.alert(t.ui.error, t.errors.finishError);
-            } finally {
+
+                // 2. XP toekennen
+                await fetchAPI('progress/xp', 'POST', {
+                    userId: userId,
+                    activityType: 'quiz_completed',
+                    activityId: `lesson_${lessonId}`,
+                    xpAmount: newScore
+                });
+
+                // 3. Navigeer één keer met alle data
                 navigation.navigate("ResultScreen", {
+                    attemptId,
+                    lessonId,
                     score: newScore
                 });
+            } catch (error) {
+                console.error("Fout bij voltooien:", error);
+                Alert.alert(t.ui.error, t.errors.finishError);
+                // Zelfs bij een error willen we vaak de score laten zien
+                navigation.navigate("ResultScreen", { score: newScore });
+            } finally {
                 setLoading(false);
             }
         } else {
-            if (isCorrect) {
-                setScore(newScore);
-            }
+            setScore(newScore);
             setCurrentIndex(currentIndex + 1);
         }
     }
