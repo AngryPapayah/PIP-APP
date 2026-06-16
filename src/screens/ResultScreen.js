@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image , Modal} from 'react-native';
+// C:/Users/ashfa/Development/TLE4/PIP-APP/src/screens/ResultScreen.js
+
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, Modal } from 'react-native';
 import { colors } from "../styles/GlobalStyles";
 import { CommonActions } from '@react-navigation/native';
 import XPBar from '../components/XPBar';
@@ -10,26 +12,23 @@ export default function ResultScreen({ navigation, route }) {
     const score = route?.params?.score || 0;
     const { t } = useLanguage();
     const [refreshXP, setRefreshXP] = useState(0);
-    const [bubbleText, setBubbleText] = useState(`Good job!`);
+    const [bubbleText, setBubbleText] = useState(t.success.goodJob);
     const [showRewardModal, setShowRewardModal] = useState(false);
     const [newlyUnlockedReward, setNewlyUnlockedReward] = useState(null);
     const [hasShownLevelUp, setHasShownLevelUp] = useState(false);
 
-    // Forceer een refresh van de XPBar na het laden van de result screen
-    React.useEffect(() => {
+    useEffect(() => {
         const timer = setTimeout(() => {
             setRefreshXP(Date.now());
         }, 500);
         return () => clearTimeout(timer);
     }, []);
 
-    // Reset hasShownLevelUp wanneer de component mount (nieuwe result screen)
-    React.useEffect(() => {
+    useEffect(() => {
         setHasShownLevelUp(false);
-        setBubbleText(`Good job!`);
-    }, []);
+        setBubbleText(t.success.goodJob);
+    }, [t]);
 
-    // Bepaal welke reward er is vrijgespeeld op basis van level
     const getRewardForLevel = (level) => {
         switch(level) {
             case 2:
@@ -41,15 +40,12 @@ export default function ResultScreen({ navigation, route }) {
         }
     };
 
-    // Handler for level-up van XPBar
-    const handleLevelUp = (newLevel, oldLevel) => {
-        // Alleen level-up melding tonen als we die nog niet hebben getoond
+    const handleLevelUp = (newLevel) => {
         if (!hasShownLevelUp) {
             setHasShownLevelUp(true);
             setBubbleText(`Congratulations! You are now level ${newLevel}!`);
         }
 
-        // Check if there's a reward for this level
         const reward = getRewardForLevel(newLevel);
         if (reward) {
             setNewlyUnlockedReward(reward);
@@ -58,12 +54,21 @@ export default function ResultScreen({ navigation, route }) {
     };
 
     const goToHome = () => {
-        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'HomeScreen' }] }));
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Main' }],
+            })
+        );
     };
 
     const goToHamsterverse = () => {
-        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'HomeScreen' }] }));
-        navigation.navigate('Hamsterverse');
+        navigation.navigate('Main', {
+            screen: 'Tabs',
+            params: {
+                screen: 'Hamsterverse'
+            }
+        });
     };
 
     const closeRewardModal = () => {
@@ -75,16 +80,13 @@ export default function ResultScreen({ navigation, route }) {
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.characterContainer}>
-                    <TextBubble text={t.success.goodJob} />
+                    <TextBubble text={bubbleText} />
                     <Image source={require('../../public/images/pip-body.png')} style={styles.characterImage} />
-                    <TextBubble text={bubbleText}/>
-                    <Image
-                        source={require('../../public/images/pip-body.png')}
-                        style={styles.characterImage}
-                    />
                 </View>
                 <Text style={styles.scoreText}>{t.ui.score}: {score}</Text>
-                <View style={styles.xpBarSection}><XPBar refreshTrigger={refreshXP} onLevelUp={handleLevelUp}/></View>
+                <View style={styles.xpBarSection}>
+                    <XPBar refreshTrigger={refreshXP} onLevelUp={handleLevelUp}/>
+                </View>
                 <TouchableOpacity style={styles.button} onPress={goToHamsterverse}>
                     <Text style={styles.buttonText}>{t.ui.hamsterverse}</Text>
                 </TouchableOpacity>
@@ -93,43 +95,28 @@ export default function ResultScreen({ navigation, route }) {
                 </TouchableOpacity>
             </View>
 
-            {/* Reward Popup Modal */}
-            <Modal
-                visible={showRewardModal}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={closeRewardModal}
-            >
+            <Modal visible={showRewardModal} transparent={true} animationType="fade" onRequestClose={closeRewardModal}>
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.primary || '#F4E1C1' }]}>
+                    <View style={styles.modalContent}>
                         <TouchableOpacity style={styles.closeButton} onPress={closeRewardModal}>
                             <Text style={styles.closeButtonText}>✕</Text>
                         </TouchableOpacity>
-
                         <View style={styles.rewardContainer}>
                             <Text style={styles.rewardTitle}>Reward Unlocked!</Text>
-
                             {newlyUnlockedReward && (
                                 <>
-                                    <Image
-                                        source={newlyUnlockedReward.image}
-                                        style={styles.rewardImage}
-                                        resizeMode="contain"
-                                    />
+                                    <Image source={newlyUnlockedReward.image} style={styles.rewardImage} resizeMode="contain" />
                                     <Text style={styles.rewardName}>{newlyUnlockedReward.name}</Text>
                                     <Text style={styles.rewardDescription}>{newlyUnlockedReward.description}</Text>
                                 </>
                             )}
-
-                            <Text style={styles.rewardFooter}>
-                                You can see your rewards in the Hamsterverse!
-                            </Text>
+                            <Text style={styles.rewardFooter}>You can see your rewards in the Hamsterverse!</Text>
                         </View>
                     </View>
                 </View>
             </Modal>
         </SafeAreaView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -144,8 +131,6 @@ const styles = StyleSheet.create({
     },
     characterContainer: {
         alignItems: 'center',
-        alignSelf: 'flex-end',
-        marginRight: 20,
         marginBottom: 20,
     },
     characterImage: {
@@ -161,7 +146,6 @@ const styles = StyleSheet.create({
     xpBarSection: {
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: colors?.primary || '#F4E1C1',
         width: '100%',
         alignItems: 'center',
     },
@@ -179,7 +163,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    // Modal styles
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -191,19 +174,12 @@ const styles = StyleSheet.create({
         padding: 24,
         width: '85%',
         alignItems: 'center',
-        position: 'relative',
         backgroundColor: colors?.primary || '#F4E1C1',
     },
     closeButton: {
         position: 'absolute',
         top: 12,
         right: 12,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1,
     },
     closeButtonText: {
         fontSize: 18,
@@ -212,14 +188,12 @@ const styles = StyleSheet.create({
     },
     rewardContainer: {
         alignItems: 'center',
-        marginTop: 8,
     },
     rewardTitle: {
         fontSize: 22,
         fontWeight: 'bold',
         color: colors?.primaryButton || '#D97706',
         marginBottom: 16,
-        textAlign: 'center',
     },
     rewardImage: {
         width: 120,
@@ -229,20 +203,16 @@ const styles = StyleSheet.create({
     rewardName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: colors?.textMain || '#141414',
         marginBottom: 8,
     },
     rewardDescription: {
         fontSize: 16,
-        color: colors?.textMain || '#141414',
         textAlign: 'center',
         marginBottom: 16,
     },
     rewardFooter: {
         fontSize: 14,
         color: colors?.accent || '#784F4E',
-        textAlign: 'center',
-        marginTop: 12,
         fontStyle: 'italic',
     },
 });

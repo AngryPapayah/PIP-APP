@@ -25,6 +25,23 @@ export const AuthProvider = ({ children }) => {
         loadUser();
     }, []);
 
+    const refreshUser = useCallback(async () => {
+        if (!user || !user.id) return;
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/users/${user.id}`);
+            const result = await response.json();
+
+            if (response.ok && result) {
+                const updatedUser = { ...user, ...result };
+                setUser(updatedUser);
+                await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+        } catch (e) {
+            console.error("[AuthContext] Refresh user failed:", e);
+        }
+    }, [user]);
+
     const login = async (userData, token = null) => {
         try {
             setUser(userData);
@@ -65,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUser, refreshUser, loading }}>
             {children}
         </AuthContext.Provider>
     );

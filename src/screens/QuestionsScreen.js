@@ -1,6 +1,6 @@
 import MultipleChoice from "../components/MultipleChoice";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SafeAreaView, StyleSheet, Text, Alert } from "react-native";
 import { colors } from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
@@ -13,112 +13,96 @@ import { useLanguage } from "../contexts/LanguageContext";
 export default function QuestionsScreen() {
     const route = useRoute();
     const navigation = useNavigation();
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const { setLoading } = useLoading();
     const { t } = useLanguage();
     const { moduleId, lessonId } = route.params;
 
     const [questions, setQuestions] = useState([]);
-    const [attemptId, setAttemptId] = useState(null)
-    const [currentIndex, setCurrentIndex] = useState(0)
+    const [attemptId, setAttemptId] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
 
     const userId = user?.id;
 
-    useEffect(() => {
-        if (userId) getQuestions();
-    }, [moduleId, lessonId, userId])
+    const getXPFromUser = (userObj) => {
+        return Number(userObj?.xp ?? userObj?.experience ?? userObj?.experience_points ?? 0);
+    };
 
-    async function getQuestions() {
-        setLoading(true)
+    const getQuestions = useCallback(async () => {
+        setLoading(true);
         try {
-            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', { userId: userId })
-            if (startData && startData.error) {
+            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', { userId });
+            if (startData?.error) {
                 Alert.alert(t.ui.error, startData.error);
                 return;
             }
-            setAttemptId(startData.attemptId)
+            setAttemptId(startData.attemptId);
 
-            const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET')
-            if (questionData && questionData.error) {
+            const questionData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions`, 'GET');
+            if (questionData?.error) {
                 Alert.alert(t.ui.error, questionData.error);
                 return;
             }
 
             const fullQuestions = await Promise.all(
-                questionData.map(async (question) => {
-                    const answerData = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions/${question.id}`, 'GET')
-                    return { ...question, answers: answerData.answers }
+                questionData.map(async (q) => {
+                    const answers = await fetchAPI(`courses/1/modules/${moduleId}/lessons/${lessonId}/questions/${q.id}`, 'GET');
+                    return { ...q, answers: answers.answers };
                 })
-            )
-            setQuestions(fullQuestions.sort(() => Math.random() - 0.5))
+            );
+            setQuestions(fullQuestions.sort(() => Math.random() - 0.5));
         } catch (error) {
             Alert.alert(t.ui.error, t.errors.generic);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    }, [userId, lessonId, moduleId, setLoading, t]);
+
+    useEffect(() => {
+        if (userId) getQuestions();
+    }, [getQuestions, userId]);
 
     async function handleNext(isCorrect) {
         const newScore = score + (isCorrect ? 10 : 0);
-        if (isCorrect) {
-            setScore(newScore);
-        }
-
-        if (isCorrect) setScore(prevScore => prevScore + 10);
         const isLast = currentIndex >= questions.length - 1;
 
         if (isLast) {
             setLoading(true);
             try {
-                // Les afronden
-                await fetchAPI(
-                    `progress/attempts/${attemptId}/complete`,
-                    'POST',
-                    {
-                        userId: userId
-                    }
-                );
-                console.log("Lesson completed");
+                await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId });
+                const res = await fetchAPI(`users/${userId}/progress/lesson/${lessonId}`, 'PUT');
 
-                // XP
-                const xpResponse = await fetchAPI(
-                    'progress/xp',
-                    'POST',
-                    {
-                        userId: userId,
+                if (res && !res.error) {
+                    updateUser({
+                        xp: res.newXp,
+                        experience: res.newXp,
+                        experience_points: res.newXp,
+                        level: res.newLevel,
+                        current_level_id: res.newLevel
+                    });
+                } else {
+                    const xpRes = await fetchAPI('progress/xp', 'POST', {
+                        userId,
                         activityType: 'quiz_completed',
                         activityId: `lesson_${lessonId}`,
-                        xpAmount: newScore
+                        xpAmount: 20
+                    });
+
+                    if (xpRes && !xpRes.error) {
+                        const updatedXP = getXPFromUser(user) + 20;
+                        updateUser({ xp: updatedXP, experience: updatedXP, experience_points: updatedXP });
                     }
-                );
-                console.log("XP RESPONSE:", xpResponse);
+                }
 
-                // Controle
-                const updatedUser = await fetchAPI(
-                    `users/${userId}`,
-                    'GET'
-                );
-                console.log("UPDATED USER:", updatedUser);
-
-                await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId: userId });
-                navigation.navigate("ResultScreen", { attemptId, lessonId, score: score + (isCorrect ? 10 : 0) });
+                navigation.navigate("ResultScreen", { score: newScore });
             } catch (error) {
-                console.error(
-                    "Er is een fout opgetreden bij het voltooien van de les:",
-                    error
-                );
                 Alert.alert(t.ui.error, t.errors.finishError);
             } finally {
-                navigation.navigate("ResultScreen", {
-                    score: newScore
-                });
                 setLoading(false);
             }
         } else {
-            if (isCorrect) {
-                setScore(newScore);
-            }
+            if (isCorrect) setScore(newScore);
             setCurrentIndex(currentIndex + 1);
         }
     }
@@ -138,7 +122,7 @@ export default function QuestionsScreen() {
                 <SwipeCard question={currentQuestion} attemptId={attemptId} onNext={handleNext} isLastQuestion={currentIndex === questions.length - 1} />
             )}
         </SafeAreaView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({ container: { padding: 10, flex: 1, backgroundColor: colors?.primary || '#FFDFAD' } });
