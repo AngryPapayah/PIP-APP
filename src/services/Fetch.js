@@ -2,12 +2,16 @@ const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function fetchAPI(endpoint, method = 'GET', body) {
     const headers = {
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "Accept-Language": savedLanguage
     };
 
     if ((method === 'POST' || method === 'PUT') && !(body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
+
+    console.log(`[FetchAPI] ${method} -> ${endpoint}`);
+    console.log(`[FetchAPI] Headers:`, headers);
 
     try {
         const baseUrl = EXPO_PUBLIC_API_URL.endsWith('/') ? EXPO_PUBLIC_API_URL : `${EXPO_PUBLIC_API_URL}/`;
@@ -22,6 +26,16 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
 
         if (res.status === 204) return null;
 
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const textError = await res.text();
+            console.error(`[Fetch Error] Non-JSON response at ${url}. Status: ${res.status}`);
+            return {
+                error: `Server error (${res.status}). Check backend connectivity.`,
+                status: res.status
+            };
+        }
+
         const data = await res.json();
 
         if (res.status === 401) {
@@ -33,17 +47,14 @@ export async function fetchAPI(endpoint, method = 'GET', body) {
         }
 
         if (!res.ok) {
-            return {
-                error: data.message || data.error || `Error ${res.status}`,
-                status: res.status
-            };
+            return { error: data.message || data.error || `Error ${res.status}`, status: res.status };
         }
 
         return data;
     } catch (e) {
         return {
-            error: "Something went wrong! Please try again later!",
-            stack: e.stack
+            error: "Network error. Check your connection.",
+            stack: e.message
         };
     }
 }

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image, Modal} from 'react-native';
-import {colors} from "../styles/GlobalStyles";
-import {CommonActions} from '@react-navigation/native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Image , Modal} from 'react-native';
+import { colors } from "../styles/GlobalStyles";
+import { CommonActions } from '@react-navigation/native';
 import XPBar from '../components/XPBar';
 import TextBubble from '../components/TextBubble';
+import { useLanguage } from '../contexts/LanguageContext';
 
-export default function ResultScreen({navigation, route}) {
-    // Haal de score op uit de route params (met 0 als fallback)
+export default function ResultScreen({ navigation, route }) {
     const score = route?.params?.score || 0;
+    const { t } = useLanguage();
     const [refreshXP, setRefreshXP] = useState(0);
     const [bubbleText, setBubbleText] = useState(`Good job!`);
     const [showRewardModal, setShowRewardModal] = useState(false);
@@ -57,21 +58,11 @@ export default function ResultScreen({navigation, route}) {
     };
 
     const goToHome = () => {
-        navigation.dispatch(
-            CommonActions.reset({
-                index: 0,
-                routes: [{name: 'HomeScreen'}],
-            })
-        );
+        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'HomeScreen' }] }));
     };
 
     const goToHamsterverse = () => {
-        navigation.dispatch(
-            CommonActions.reset({
-                index: 0,
-                routes: [{name: 'HomeScreen'}],
-            })
-        );
+        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'HomeScreen' }] }));
         navigation.navigate('Hamsterverse');
     };
 
@@ -84,30 +75,21 @@ export default function ResultScreen({navigation, route}) {
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.characterContainer}>
+                    <TextBubble text={t.success.goodJob} />
+                    <Image source={require('../../public/images/pip-body.png')} style={styles.characterImage} />
                     <TextBubble text={bubbleText}/>
                     <Image
                         source={require('../../public/images/pip-body.png')}
                         style={styles.characterImage}
                     />
                 </View>
-
-                <Text style={styles.scoreText}>Score: {score}</Text>
-
-                <View style={styles.xpBarSection}>
-                    <XPBar refreshTrigger={refreshXP} onLevelUp={handleLevelUp} />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={goToHamsterverse}
-                >
-                    <Text style={styles.buttonText}>Hamsterverse</Text>
+                <Text style={styles.scoreText}>{t.ui.score}: {score}</Text>
+                <View style={styles.xpBarSection}><XPBar refreshTrigger={refreshXP} onLevelUp={handleLevelUp}/></View>
+                <TouchableOpacity style={styles.button} onPress={goToHamsterverse}>
+                    <Text style={styles.buttonText}>{t.ui.hamsterverse}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={goToHome}
-                >
-                    <Text style={styles.buttonText}>Home</Text>
+                <TouchableOpacity style={styles.button} onPress={goToHome}>
+                    <Text style={styles.buttonText}>{t.ui.home}</Text>
                 </TouchableOpacity>
             </View>
 

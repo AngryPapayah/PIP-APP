@@ -26,22 +26,20 @@ export default function XPBar({ onXPChange, onLevelUp }) {
         try {
             setLoading(true);
             const response = await fetchAPI(`users/${user.id}`, 'GET');
-            console.log("User data response:", response);
 
-            if (response?.success && response?.data) {
-                const userData = response.data;
-                const experience = userData.experience || 0;
+            if (response?.status === 502) {
+                console.warn("XPBar: Server unreachable (502)");
+                return;
+            }
 
-                setTotalXP(experience);
-                const level = Math.floor(experience / 100) + 1;
-                const currentXP = experience % 100;
+            if (response && response.xp !== undefined) {
+                const userTotalXP = response.xp || 0;
+                const level = Math.floor(userTotalXP / XP_PER_LEVEL) + 1;
+                const xpInLevel = userTotalXP % XP_PER_LEVEL;
 
-                setXP(currentXP);
-                setCurrentLevel(Math.min(level, MAX_LEVEL));
-
-                if (onXPChange) {
-                    onXPChange({ xp: experience, level: Math.min(level, MAX_LEVEL) });
-                }
+                setXP(xpInLevel);
+                setTotalXP(userTotalXP);
+                setCurrentLevel(level);
             }
         } catch (error) {
             console.error('Error fetching progress:', error);
