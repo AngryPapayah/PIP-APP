@@ -1,21 +1,22 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../styles/GlobalStyles';
+import React, {useEffect, useState, useCallback, useRef} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {colors} from '../styles/GlobalStyles';
 import ModulesList from "./courses/modules/ModulesList";
-import { CopilotStep, useCopilot, walkthroughable } from "react-native-copilot";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { useAuth } from "../contexts/AuthContext";
-import { useLanguage } from '../contexts/LanguageContext';
+import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
+import {useNavigation, useFocusEffect} from "@react-navigation/native";
+import {useAuth} from "../contexts/AuthContext";
+import {useLanguage} from '../contexts/LanguageContext';
+import safeAreaView from "react-native-web/src/exports/SafeAreaView";
 
-const CopilotView = walkthroughable(({ style, children, ...props }) => (
+const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
 ));
 
 export default function HomeScreen() {
     const navigation = useNavigation();
-    const { user, refreshUser } = useAuth();
-    const { t } = useLanguage();
-    const { start, copilotEvents } = useCopilot();
+    const {user, refreshUser} = useAuth();
+    const {t} = useLanguage();
+    const {start, copilotEvents} = useCopilot();
     const [isLayoutReady, setIsLayoutReady] = useState(false);
     const hasStartedTour = useRef(false);
 
@@ -39,7 +40,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         copilotEvents.on('stop', () => {
-            navigation.navigate('Profile', { startTour: true });
+            navigation.navigate('Profile', {startTour: true});
         });
         return () => {
             copilotEvents.off('start');
@@ -48,25 +49,31 @@ export default function HomeScreen() {
     }, [navigation, copilotEvents]);
 
     return (
-        <View style={styles.container} onLayout={() => setIsLayoutReady(true)}>
-            <CopilotStep name="WelcomeText" order={1} text={t.onboarding.homeWelcomeText}>
-                <CopilotView>
-                    <Text style={styles.text}>{t.ui.yourModules}</Text>
-                </CopilotView>
-            </CopilotStep>
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView style={styles.container} onLayout={() => setIsLayoutReady(true)}>
+                <CopilotStep name="WelcomeText" order={1} text={t.onboarding.homeWelcomeText}>
+                    <CopilotView>
+                        <Text style={styles.text}>{t.ui.yourModules}</Text>
+                    </CopilotView>
+                </CopilotStep>
 
-            <CopilotStep name="ModulesList" order={2} text={t.onboarding.homeModulesText}>
-                <CopilotView>
-                    <ModulesList />
-                </CopilotView>
-            </CopilotStep>
-        </View>
+                <CopilotStep name="ModulesList" order={2} text={t.onboarding.homeModulesText}>
+                    <CopilotView>
+                        <ModulesList/>
+                    </CopilotView>
+                </CopilotStep>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    safeAreaView: {
         flex: 1,
+        backgroundColor: colors?.primary || '#F4E1C1',
+    },
+    container: {
+        flexGrow: 1,
         backgroundColor: colors?.primary || '#F4E1C1',
         alignItems: 'center',
         justifyContent: 'center',
