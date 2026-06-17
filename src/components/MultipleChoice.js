@@ -77,7 +77,6 @@ export default function MultipleChoice({question, onNext, isLastQuestion}) {
                             variant={currentVariant}
                             size="sm"
                             onPress={() => handleAnswer(answer)}
-                            disabled={hasAnswered}
                         >{answer.answer_text}</CustomButton>
                     );
                 })}
@@ -88,7 +87,7 @@ export default function MultipleChoice({question, onNext, isLastQuestion}) {
 
 const styles = StyleSheet.create({
     container: {padding: 20, flex: 1, backgroundColor: colors?.primary || '#FFDFAD', alignItems: 'center'},
-    scrollContainer: {padding: 5, flex: 1, backgroundColor: colors?.primary || '#FFDFAD'},
-    answersContainer: {width: "100%"},
+    scrollContainer: {padding: 5, flexGrow: 1, backgroundColor: colors?.primary || '#FFDFAD'},
+    answersContainer: {width: "100%", marginBottom: 100},
     imageStyle: {width: 200, height: 200, marginLeft: 15}
 });

@@ -1,7 +1,7 @@
 import MultipleChoice from "../components/MultipleChoice";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {SafeAreaView, StyleSheet, Text, Alert, View, ScrollView} from "react-native";
+import {SafeAreaView, StyleSheet, Text, Alert, View} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
@@ -134,7 +134,7 @@ export default function QuestionsScreen() {
     return (
         <SafeAreaView style={styles.safeAreaView}>
 
-            <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.container}>
 
                 <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
                 {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
@@ -150,7 +150,7 @@ export default function QuestionsScreen() {
                         isLastQuestion={currentIndex === questions.length - 1}
                     />
                 )}
-            </ScrollView>
+            </View>
 
         </SafeAreaView>
     );

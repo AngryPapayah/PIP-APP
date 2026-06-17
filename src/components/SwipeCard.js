@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     container: {flex: 1, alignItems: 'center', backgroundColor: colors?.primary || '#FFDFAD'},
     card: {
         width: 300,
-        height: 400,
+        height: 220,
         borderRadius: 10,
         backgroundColor: '#fff',
         alignItems: 'center',
