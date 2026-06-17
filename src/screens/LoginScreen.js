@@ -44,13 +44,14 @@ export default function LoginScreen({ navigation }) {
                 console.log('Login successful:', response);
 
                 const user = response.data?.user;
+                const token = response.data?.token;
                 const needsOnboarding = user?.on_boarding === 0;
 
                 if (needsOnboarding) {
                     user.startTour = true;
                 }
 
-                login(user);
+                await login(user, token);
             }
         } catch (error) {
             console.error('Login failed:', error);
@@ -91,7 +92,7 @@ export default function LoginScreen({ navigation }) {
                     />
                     <TextInput
                         style={styles.input}
-                        placeholder={t.ui.password} // Use translations for placeholders
+                        placeholder={t.ui.password}
                         placeholderTextColor="#888"
                         value={password}
                         onChangeText={setPassword}

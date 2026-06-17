@@ -1,58 +1,45 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Image, Animated} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Image, Animated } from 'react-native';
 import XPBar from '../components/XPBar';
-import {colors} from '../styles/GlobalStyles';
-import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
-import {useAuth} from "../contexts/AuthContext";
-import {useNavigation, useRoute} from "@react-navigation/native";
-import {fetchAPI} from "../services/Fetch";
+import { colors } from '../styles/GlobalStyles';
+import { CopilotStep, useCopilot, walkthroughable } from "react-native-copilot";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { fetchAPI } from "../services/Fetch";
 
-//onboarding
-const CopilotView = walkthroughable(({style, children, ...props}) => (
+const CopilotView = walkthroughable(({ style, children, ...props }) => (
     <View style={style} {...props}>{children}</View>
 ));
 
 export default function HamsterverseScreen() {
-    const [xp, setXP] = useState(0);
-    const [level, setLevel] = useState(1);
+    const [xpState, setXpState] = useState(0);
+    const [levelState, setLevelState] = useState(1);
     const [bounceAnim] = useState(new Animated.Value(0));
 
-    //onboarding
-    const {user, updateUser} = useAuth();
-    const navigation = useNavigation()
-    const route = useRoute()
+    const { user, updateUser } = useAuth();
+    const navigation = useNavigation();
+    const route = useRoute();
 
-    //onboarding
-    const {start, copilotEvents} = useCopilot()
+    const { start, copilotEvents } = useCopilot();
     const [isLayoutReady, setIsLayoutReady] = useState(false);
 
-    //onboarding
     useEffect(() => {
-        const starting = route?.params?.startTour
+        const starting = route?.params?.startTour;
 
-        if (isLayoutReady && starting) {
-            // console.log("LOG: hamsterverse layout klaar. Start hamsterverse-tour!");
+        if (isLayoutReady && starting && user?.on_boarding === 0) {
             const timer = setTimeout(() => {
                 start("Hamsterverse");
             }, 600);
 
             return () => clearTimeout(timer);
         }
-    }, [isLayoutReady, route?.params]);
+    }, [isLayoutReady, route?.params, user?.on_boarding]);
 
-    //onboarding
     useEffect(() => {
-
-        copilotEvents.on('start', () => {
-            // console.log("COPILOT EVENT: De onboarding-tour is OFFICIEEL gestart op het scherm!");
-        });
-
         copilotEvents.on('stop', async () => {
-            // console.log("Tour op hamsterverse klaar, status veranderen en naar home")
-
             if (user?.id) {
                 try {
-                    const result = await fetchAPI(`users/${user.id}/complete-onboarding`, "POST", {on_boarding: 1})
+                    const result = await fetchAPI(`users/${user.id}/complete-onboarding`, "POST", { on_boarding: 1 });
                     if (result && result.error) {
                         console.error("Server update failed:", result.error);
                     } else {
@@ -60,8 +47,7 @@ export default function HamsterverseScreen() {
                     }
 
                     if (updateUser) {
-                        await updateUser({on_boarding: 1});
-                        // console.log("LOG: Local state en AsyncStorage succesfully edited!");
+                        await updateUser({ on_boarding: 1, startTour: false });
                     }
 
                 } catch (error) {
@@ -70,65 +56,60 @@ export default function HamsterverseScreen() {
             }
             navigation.reset({
                 index: 0,
-                routes: [{name: 'Home', params: {startTour: false}}],
+                routes: [{ name: 'Home', params: { startTour: false } }],
             });
-        })
+        });
 
         return () => {
-            copilotEvents.off('start')
-            copilotEvents.off('stop')
-        }
-    }, [updateUser]);
+            copilotEvents.off('start');
+            copilotEvents.off('stop');
+        };
+    }, [updateUser, user?.id, navigation, copilotEvents]);
 
-    // Handle XP changes from XPBar
     const handleXPChange = (data) => {
-        setXP(data.xp);
-        setLevel(data.level);
+        setXpState(data.xp);
+        setLevelState(data.level);
     };
 
-    // Bouncing pip animation
     useEffect(() => {
         const animate = () => {
             Animated.sequence([
-                Animated.timing(bounceAnim, {toValue: 1, duration: 700, useNativeDriver: true}),
-                Animated.timing(bounceAnim, {toValue: 0, duration: 700, useNativeDriver: true}),
+                Animated.timing(bounceAnim, { toValue: 1, duration: 700, useNativeDriver: true }),
+                Animated.timing(bounceAnim, { toValue: 0, duration: 700, useNativeDriver: true }),
             ]).start(() => animate());
         };
         animate();
     }, [bounceAnim]);
 
-    // Calculate items per XP (like original code)
-    const hasFood = xp >= 100;   // Food at 100 XP (Level 2)
-    const hasWheel = xp >= 200;  // Wheel at 200 XP (Level 3)
+    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? user?.experience ?? 0;
+    const level = Math.floor(xp / 100) + 1;
+    const currentXP = xp % 100;
 
-    const bounce = bounceAnim.interpolate({inputRange: [0, 1], outputRange: [0, -8]});
+    const hasFood = xp >= 100;
+    const hasWheel = xp >= 200;
+
+    const bounce = bounceAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -8] });
 
     return (
-
         <View style={styles.container} onLayout={() => setIsLayoutReady(true)}>
-            {/* XPBar component */}
             <View style={styles.xpBarSection}>
-                <XPBar onXPChange={handleXPChange}/>
+                <XPBar currentXP={currentXP} level={level} onXPChange={handleXPChange} />
             </View>
 
             <CopilotStep name="Hamsterverse" order={5}
                          text="Welcome to the Hamsterverse. This is Pip’s habitat, where you can view and collect rewards earned by successfully completing lessons.">
-                <CopilotView>
-                </CopilotView>
+                <CopilotView />
             </CopilotStep>
 
             <CopilotStep name="EndText" order={6}
                          text="This concludes your introduction to P.I.P. You're now ready to begin your first lesson.">
-                <CopilotView>
-                </CopilotView>
+                <CopilotView />
             </CopilotStep>
 
-            {/* Habitat two tone (beige top, orange bottom) */}
             <View style={styles.habitat}>
-                <View style={styles.habitatTop}/>
-                <View style={styles.habitatBottom}/>
+                <View style={styles.habitatTop} />
+                <View style={styles.habitatBottom} />
 
-                {/* Food bowl appears at 100 XP */}
                 {hasFood && (
                     <Image
                         source={require('../../public/images/food.png')}
@@ -138,7 +119,6 @@ export default function HamsterverseScreen() {
                     />
                 )}
 
-                {/* Hamsterwheel appears at 200 XP */}
                 {hasWheel && (
                     <Image
                         source={require('../../public/images/wheel.png')}
@@ -148,8 +128,7 @@ export default function HamsterverseScreen() {
                     />
                 )}
 
-                {/* P.I.P. single hamster centered in bottom area */}
-                <Animated.View style={[styles.pipContainer, {transform: [{translateY: bounce}]}]}>
+                <Animated.View style={[styles.pipContainer, { transform: [{ translateY: bounce }] }]}>
                     <Image
                         source={require('../../public/images/pip-body.png')}
                         style={styles.pipImage}
@@ -163,58 +142,13 @@ export default function HamsterverseScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    xpBarSection: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        backgroundColor: colors?.primary || '#FFDFAD',
-    },
-    habitat: {
-        flex: 1,
-        position: 'relative',
-        overflow: 'hidden',
-        backgroundColor: colors?.primary || '#FFDFAD',
-    },
-    habitatTop: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '45%',
-    },
-    habitatBottom: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: '55%',
-        backgroundColor: colors?.primaryButton || '#F09D67',
-    },
-    foodPosition: {
-        position: 'absolute',
-        left: '75%',
-        top: '65%',
-        width: 70,
-        height: 70,
-    },
-    wheelPosition: {
-        position: 'absolute',
-        left: '55%',
-        bottom: '50%',
-        width: 160,
-        height: 160,
-    },
-    pipContainer: {
-        position: 'absolute',
-        bottom: '20%',
-        left: '50%',
-        marginLeft: -45,
-        alignItems: 'center',
-    },
-    pipImage: {
-        width: 120,
-        height: 120,
-    },
+    container: { flex: 1 },
+    xpBarSection: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: colors?.primary || '#FFDFAD' },
+    habitat: { flex: 1, position: 'relative', overflow: 'hidden', backgroundColor: colors?.primary || '#FFDFAD' },
+    habitatTop: { position: 'absolute', top: 0, left: 0, right: 0, height: '45%' },
+    habitatBottom: { position: 'absolute', left: 0, right: 0, bottom: 0, height: '55%', backgroundColor: colors?.primaryButton || '#F09D67' },
+    foodPosition: { position: 'absolute', left: '75%', top: '65%', width: 70, height: 70 },
+    wheelPosition: { position: 'absolute', left: '55%', bottom: '50%', width: 160, height: 160 },
+    pipContainer: { position: 'absolute', bottom: '20%', left: '50%', marginLeft: -45, alignItems: 'center' },
+    pipImage: { width: 120, height: 120 },
 });

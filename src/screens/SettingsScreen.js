@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert, DevSettings, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, DevSettings } from 'react-native';
 import * as Updates from 'expo-updates';
 import { colors } from '../styles/GlobalStyles';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -12,20 +12,15 @@ export default function SettingsScreen({ onClose }) {
     const languages = [
         { code: 'en', label: 'English' },
         { code: 'nl', label: 'Nederlands' },
-        { code: 'hamster', label: '🐹 Hamster' }
+        { code: 'hamster', label: 'Hamster' }
     ];
 
     const handleApplyLanguage = async () => {
         try {
-            // 1. Persist the language choice first
             await setLanguage(tempLanguage);
-
-            // 2. Restart the app
             if (__DEV__) {
-                // DevSettings is more reliable for local development/Expo Go
                 DevSettings.reload();
             } else {
-                // Updates.reloadAsync() is used for production builds
                 Updates.reloadAsync();
             }
         } catch (error) {

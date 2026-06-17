@@ -4,7 +4,6 @@ import { fetchAPI, removeToken, storeToken, USE_JWT } from '../services/Fetch';
 
 const AuthContext = createContext(null);
 
-
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -26,18 +25,20 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const refreshUser = useCallback(async () => {
-        if (!user?.id) return;
+        if (!user?.id) return null;
         const result = await fetchAPI(`users/${user.id}`, 'GET');
         const newUserData = result?.data?.user || result?.data || result;
         if (newUserData && !result.error) {
             setUser((prevUser) => {
-                const updatedUser = { ...prevUser, ...newUserData };
+                const updatedUser = { ...prevUser, ...newUserData, startTour: prevUser?.startTour };
                 AsyncStorage.setItem('user', JSON.stringify(updatedUser)).catch(err =>
                     console.error("Sync error:", err)
                 );
                 return updatedUser;
             });
+            return newUserData;
         }
+        return null;
     }, [user?.id]);
 
     const login = async (userData, token = null) => {

@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 //dit is zegmaar een toggle zodat we jwt in 1 keer aan kunnen zetten wanneer we dat wille jatoch
-export const USE_JWT = false;
+export const USE_JWT = true;
 
 export async function storeToken(token) {
     if (token) {

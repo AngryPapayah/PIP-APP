@@ -5,10 +5,12 @@ import { CommonActions } from '@react-navigation/native';
 import XPBar from '../components/XPBar';
 import TextBubble from '../components/TextBubble';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ResultScreen({ navigation, route }) {
     const score = route?.params?.score || 0;
     const { t } = useLanguage();
+    const { user } = useAuth();
     const [refreshXP, setRefreshXP] = useState(0);
     const [bubbleText, setBubbleText] = useState(t.success.goodJob);
     const [showRewardModal, setShowRewardModal] = useState(false);
@@ -51,18 +53,31 @@ export default function ResultScreen({ navigation, route }) {
     };
 
     const goToHome = () => {
-        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Main' }] }));
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Main', state: { routes: [{ name: 'Home' }] } }],
+            })
+        );
     };
 
     const goToHamsterverse = () => {
-        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Main' }] }));
-        navigation.navigate('Hamsterverse');
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Main', state: { routes: [{ name: 'Hamsterverse' }] } }],
+            })
+        );
     };
 
     const closeRewardModal = () => {
         setShowRewardModal(false);
         setNewlyUnlockedReward(null);
     };
+
+    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? user?.experience ?? 0;
+    const level = Math.floor(xp / 100) + 1;
+    const currentXP = xp % 100;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -71,13 +86,18 @@ export default function ResultScreen({ navigation, route }) {
                     <TextBubble text={bubbleText} />
                     <Image source={require('../../public/images/pip-body.png')} style={styles.characterImage} />
                 </View>
-                <Text style={styles.scoreText}>{t.ui.score}: {score}</Text>
-                <View style={styles.xpBarSection}><XPBar refreshTrigger={refreshXP} onLevelUp={handleLevelUp} /></View>
+                <Text style={styles.scoreText}>{t.ui.score}: {score}%</Text>
+                <View style={styles.xpBarSection}>
+                    <XPBar currentXP={currentXP} level={level} refreshTrigger={refreshXP} onLevelUp={handleLevelUp} />
+                </View>
+            </View>
+
+            <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={goToHamsterverse}>
-                    <Text style={styles.buttonText}>{t.ui.hamsterverse}</Text>
+                    <Text style={styles.buttonText}>{t.ui.hamsterverse || "Hamsterverse"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={goToHome}>
-                    <Text style={styles.buttonText}>{t.ui.home}</Text>
+                    <Text style={styles.buttonText}>{t.ui.home || "Home"}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -112,7 +132,8 @@ const styles = StyleSheet.create({
     characterImage: { width: 150, height: 150, resizeMode: 'contain' },
     scoreText: { fontSize: 24, fontWeight: 'bold', color: colors?.textMain || '#141414' },
     xpBarSection: { paddingHorizontal: 16, paddingVertical: 12, width: '100%', alignItems: 'center' },
-    button: { backgroundColor: colors.secondary, paddingVertical: 15, paddingHorizontal: 30, borderRadius: 25, marginVertical: 10, width: '80%', alignItems: 'center' },
+    buttonContainer: { width: '100%', alignItems: 'center', marginBottom: 20 },
+    button: { backgroundColor: colors.secondary, paddingVertical: 15, paddingHorizontal: 30, borderRadius: 25, marginVertical: 8, width: '80%', alignItems: 'center' },
     buttonText: { color: colors.textMain || '#141414', fontSize: 18, fontWeight: 'bold' },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' },
     modalContent: { borderRadius: 25, padding: 24, width: '85%', alignItems: 'center', position: 'relative' },
