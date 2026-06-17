@@ -1,5 +1,5 @@
 import {CustomButton} from "./CustomButton";
-import {ScrollView, StyleSheet, View, Image} from "react-native";
+import {ScrollView, StyleSheet, View, Image, SafeAreaView} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import React, {useEffect, useState} from "react";
 import TextBubble from "./TextBubble";
@@ -39,49 +39,51 @@ export default function MultipleChoice({question, onNext, isLastQuestion}) {
     }
 
     return (
-        <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
-            {hasAnswered ? (
-                <View style={styles.container}>
-                    {question?.explanation && (
-                        <TextBubble text={question?.explanation}></TextBubble>
-                    )}
-                    <Image source={pipImage} style={styles.imageStyle} resizeMode="contain"/>
-                    <View>
-                        <CustomButton
-                            variant="primary"
-                            size="sm"
-                            onPress={() => onNext(isCorrectAnswer, selectedAnswerId)}>
-                            {isLastQuestion ? "Finish" : "Next question >>>"}
-                        </CustomButton>
+        <SafeAreaView style={styles.safeAreaView}>
+            <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
+                {hasAnswered ? (
+                    <View style={styles.container}>
+                        {question?.explanation && (
+                            <TextBubble text={question?.explanation}></TextBubble>
+                        )}
+                        <Image source={pipImage} style={styles.imageStyle} resizeMode="contain"/>
+                        <View>
+                            <CustomButton
+                                variant="primary"
+                                size="sm"
+                                onPress={() => onNext(isCorrectAnswer, selectedAnswerId)}>
+                                {isLastQuestion ? "Finish" : "Next question >>>"}
+                            </CustomButton>
+                        </View>
                     </View>
-                </View>
-            ) : (
-                <View style={styles.container}>
-                    <TextBubble text={question?.question_text || "Loading Question..."}></TextBubble>
-                    <Image source={pipImage} style={styles.imageStyle} resizeMode="contain"/>
-                </View>
-            )}
-            <View style={styles.answersContainer}>
-                {question?.answers?.map((answer) => {
-                    let currentVariant = "questionButton";
-                    if (hasAnswered) {
-                        if (answer.is_correct === 1 || answer.is_correct === true) {
-                            currentVariant = "rightAnswer";
-                        } else if (answer.id === selectedAnswerId) {
-                            currentVariant = "wrongAnswer";
+                ) : (
+                    <View style={styles.container}>
+                        <TextBubble text={question?.question_text || "Loading Question..."}></TextBubble>
+                        <Image source={pipImage} style={styles.imageStyle} resizeMode="contain"/>
+                    </View>
+                )}
+                <View style={styles.answersContainer}>
+                    {question?.answers?.map((answer) => {
+                        let currentVariant = "questionButton";
+                        if (hasAnswered) {
+                            if (answer.is_correct === 1 || answer.is_correct === true) {
+                                currentVariant = "rightAnswer";
+                            } else if (answer.id === selectedAnswerId) {
+                                currentVariant = "wrongAnswer";
+                            }
                         }
-                    }
-                    return (
-                        <CustomButton
-                            key={answer.id}
-                            variant={currentVariant}
-                            size="sm"
-                            onPress={() => handleAnswer(answer)}
-                        >{answer.answer_text}</CustomButton>
-                    );
-                })}
-            </View>
-        </ScrollView>
+                        return (
+                            <CustomButton
+                                key={answer.id}
+                                variant={currentVariant}
+                                size="sm"
+                                onPress={() => handleAnswer(answer)}
+                            >{answer.answer_text}</CustomButton>
+                        );
+                    })}
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
@@ -97,5 +99,9 @@ const styles = StyleSheet.create({
         paddingBottom: 60,
     },
     answersContainer: {width: "100%", marginBottom: 100},
-    imageStyle: {width: 200, height: 200, marginLeft: 15}
+    imageStyle: {width: 200, height: 200, marginLeft: 15},
+    safeAreaView: {
+        flex: 1,
+        backgroundColor: colors?.primary || '#F4E1C1',
+    },
 });
