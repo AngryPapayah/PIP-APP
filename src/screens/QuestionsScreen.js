@@ -159,7 +159,7 @@ export default function QuestionsScreen() {
 const styles = StyleSheet.create({
     container: {
         padding: 10,
-        flexGrow: 1,
+        flex: 1,
         backgroundColor: colors?.primary || '#FFDFAD'
     },
     safeAreaView: {
