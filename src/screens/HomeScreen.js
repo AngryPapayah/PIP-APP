@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useCallback, useRef} from 'react';
+import {SafeAreaView} from "react-native-safe-area-context";
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {colors} from '../styles/GlobalStyles';
 import ModulesList from "./courses/modules/ModulesList";
