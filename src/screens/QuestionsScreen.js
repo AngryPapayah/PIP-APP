@@ -132,9 +132,10 @@ export default function QuestionsScreen() {
     const currentQuestion = questions[currentIndex];
 
     return (
-        <ScrollView>
 
-            <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container}>
+            <ScrollView>
+
                 <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
                 {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
                     <MultipleChoice
@@ -149,8 +150,9 @@ export default function QuestionsScreen() {
                         isLastQuestion={currentIndex === questions.length - 1}
                     />
                 )}
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+
+        </SafeAreaView>
 
     );
 }
