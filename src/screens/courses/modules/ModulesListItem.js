@@ -1,11 +1,11 @@
-import { StyleSheet, View } from "react-native";
-import { Card } from "../../../components/Card";
-import { useNavigation } from "@react-navigation/native";
-import { useLanguage } from "../../../contexts/LanguageContext";
+import {StyleSheet, View} from "react-native";
+import {Card} from "../../../components/Card";
+import {useNavigation} from "@react-navigation/native";
+import {useLanguage} from "../../../contexts/LanguageContext";
 
-export default function ModulesListItem({ module }) {
+export default function ModulesListItem({module}) {
     const navigation = useNavigation();
-    const { t } = useLanguage();
+    const {t} = useLanguage();
 
     return (
         <View style={styles.container}>
@@ -14,7 +14,7 @@ export default function ModulesListItem({ module }) {
                 lessonTitle={module.title}
                 description={module.description}
                 buttonText={t.ui.showLessons}
-                onPress={() => navigation.navigate("LessonsList", {
+                onPress={() => navigation.navigate("Lessons", {
                     moduleId: module.id,
                     moduleTitle: module.title
                 })}

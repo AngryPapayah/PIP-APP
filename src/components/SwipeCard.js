@@ -71,7 +71,7 @@ export default function SwipeCard({question, onNext, isLastQuestion}) {
             inputRange: [-SCREEN_WIDTH * 1.5, 0, SCREEN_WIDTH * 1.5],
             outputRange: ['-120deg', '0deg', '120deg'],
         });
-        return { ...position.getLayout(), transform: [{rotate}] };
+        return {...position.getLayout(), transform: [{rotate}]};
     };
 
     let pipImage = require('../../public/images/pip-body.png');
@@ -82,8 +82,9 @@ export default function SwipeCard({question, onNext, isLastQuestion}) {
     return (
         <View style={styles.container}>
             <View style={styles.pipContainer}>
-                <TextBubble text={hasAnswered ? (question?.explanation || '') : (question?.question_text || "Loading Question...")}/>
-                <Image source={pipImage} style={styles.pipImage} resizeMode="contain" />
+                <TextBubble
+                    text={hasAnswered ? (question?.explanation || '') : (question?.question_text || "Loading Question...")}/>
+                <Image source={pipImage} style={styles.pipImage} resizeMode="contain"/>
             </View>
             {hasAnswered ? (
                 <View style={styles.feedbackContainer}>
@@ -94,10 +95,12 @@ export default function SwipeCard({question, onNext, isLastQuestion}) {
             ) : (
                 <View style={styles.cardContainer}>
                     <Animated.View style={[styles.card, getCardStyle()]} {...panResponder.panHandlers}>
-                        <Text style={styles.trueFalseText}>False or true?</Text>
+                        <Text style={styles.trueFalseText}>Unsafe or Safe?</Text>
                         <View style={styles.buttonContainer}>
-                            <TouchableOpacity onPress={() => forceSwipe('left')}><Text style={styles.thumbStyle}>👎</Text></TouchableOpacity>
-                            <TouchableOpacity onPress={() => forceSwipe('right')}><Text style={styles.thumbStyle}>👍</Text></TouchableOpacity>
+                            <TouchableOpacity onPress={() => forceSwipe('left')}><Text
+                                style={styles.thumbStyle}>👎</Text></TouchableOpacity>
+                            <TouchableOpacity onPress={() => forceSwipe('right')}><Text
+                                style={styles.thumbStyle}>👍</Text></TouchableOpacity>
                         </View>
                     </Animated.View>
                 </View>
@@ -107,13 +110,20 @@ export default function SwipeCard({question, onNext, isLastQuestion}) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, alignItems: 'center', backgroundColor: colors?.primary || '#FFDFAD' },
-    card: { width: 300, height: 400, borderRadius: 10, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-    pipContainer: { alignItems: 'flex-end', alignSelf: 'stretch', marginHorizontal: 15, marginTop: 40 },
-    pipImage: { width: 100, height: 100 },
-    trueFalseText: { fontSize: 24, fontWeight: 'bold' },
-    buttonContainer: { flexDirection: 'row', justifyContent: 'space-between', width: 120 },
-    thumbStyle: { fontSize: 40 },
-    feedbackContainer: { height: 420, justifyContent: 'center' },
-    cardContainer: { height: 420, justifyContent: 'center' }
+    container: {flex: 1, alignItems: 'center', backgroundColor: colors?.primary || '#FFDFAD'},
+    card: {
+        width: 300,
+        height: 400,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    pipContainer: {alignItems: 'flex-end', alignSelf: 'stretch', marginHorizontal: 15, marginTop: 40},
+    pipImage: {width: 100, height: 100},
+    trueFalseText: {fontSize: 24, fontWeight: 'bold'},
+    buttonContainer: {flexDirection: 'row', justifyContent: 'space-between', width: 120},
+    thumbStyle: {fontSize: 40},
+    feedbackContainer: {height: 420, justifyContent: 'center'},
+    cardContainer: {height: 420, justifyContent: 'center'}
 });

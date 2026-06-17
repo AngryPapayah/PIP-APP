@@ -134,7 +134,7 @@ export default function QuestionsScreen() {
     return (
         <SafeAreaView style={styles.safeAreaView}>
 
-            <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
+            <ScrollView contentContainerStyle={styles.container}>
 
                 <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
                 {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
@@ -159,7 +159,7 @@ export default function QuestionsScreen() {
 const styles = StyleSheet.create({
     container: {
         padding: 10,
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: colors?.primary || '#FFDFAD'
     },
     safeAreaView: {

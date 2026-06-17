@@ -49,20 +49,20 @@ export default function HomeScreen() {
     }, [navigation, copilotEvents]);
 
     return (
-        <SafeAreaView style={styles.safeAreaView}>
-            <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
-                <CopilotStep name="WelcomeText" order={1} text={t.onboarding.homeWelcomeText}>
-                    <CopilotView>
-                        <Text style={styles.text}>{t.ui.yourModules}</Text>
-                    </CopilotView>
-                </CopilotStep>
+        <SafeAreaView style={styles.safeAreaView} onLayout={() => setIsLayoutReady(true)}>
+            {/*<ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>*/}
+            <CopilotStep name="WelcomeText" order={1} text={t.onboarding.homeWelcomeText}>
+                <CopilotView>
+                    <Text style={styles.text}>{t.ui.yourModules}</Text>
+                </CopilotView>
+            </CopilotStep>
 
-                <CopilotStep name="ModulesList" order={2} text={t.onboarding.homeModulesText}>
-                    <CopilotView>
-                        <ModulesList/>
-                    </CopilotView>
-                </CopilotStep>
-            </ScrollView>
+            <CopilotStep name="ModulesList" order={2} text={t.onboarding.homeModulesText}>
+                <CopilotView style={{flex: 1}}>
+                    <ModulesList/>
+                </CopilotView>
+            </CopilotStep>
+            {/*</ScrollView>*/}
         </SafeAreaView>
     );
 }

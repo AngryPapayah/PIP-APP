@@ -51,7 +51,7 @@ export default function ModulesList() {
     }, [selectedTitle, modules]);
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
             {filteredModules.length === 0 ? (
                 <View>
                     <Text>{t.errors.noModules}</Text>
@@ -68,7 +68,7 @@ export default function ModulesList() {
                     )}
                 />
             )}
-        </ScrollView>
+        </View>
     );
 }
 

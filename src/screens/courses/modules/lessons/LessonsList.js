@@ -40,18 +40,43 @@ export default function LessonsList() {
         }
     }
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={{fontSize: 25}}>🔙</Text>
-                </TouchableOpacity>
+    const renderHeader = () => (
+        <View style={styles.headerContainer}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Text style={{fontSize: 25}}>🔙</Text>
+            </TouchableOpacity>
+            <View style={styles.titleWrapper}>
                 <Text style={styles.text}>{t.ui.lessonsFrom} {moduleTitle}</Text>
             </View>
+        </View>
+    );
+
+    return (
+        // <View style={styles.container}>
+        //     <View style={styles.headerContainer}>
+        //         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        //             <Text style={{fontSize: 25}}>🔙</Text>
+        //         </TouchableOpacity>
+        //         <Text style={styles.text}>{t.ui.lessonsFrom} {moduleTitle}</Text>
+        //     </View>
+        //     <FlatList
+        //         style={{flex: 1}}
+        //         data={lessons}
+        //         keyExtractor={(item) => item.id.toString()}
+        //         contentContainerStyle={styles.listContainer}
+        //         renderItem={({item}) => (
+        //             <View style={styles.itemWrapper}>
+        //                 <LessonsListItem lesson={item} moduleId={moduleId}/>
+        //             </View>
+        //         )}
+        //     />
+        // </View>
+        <View style={styles.container}>
             <FlatList
                 style={{flex: 1}}
                 data={lessons}
                 keyExtractor={(item) => item.id.toString()}
+                ListHeaderComponent={renderHeader} // <-- De header scrolt nu veilig mee
                 contentContainerStyle={styles.listContainer}
                 renderItem={({item}) => (
                     <View style={styles.itemWrapper}>
