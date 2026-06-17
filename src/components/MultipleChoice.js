@@ -87,7 +87,10 @@ export default function MultipleChoice({question, onNext, isLastQuestion}) {
 
 const styles = StyleSheet.create({
     container: {padding: 20, backgroundColor: colors?.primary || '#FFDFAD', alignItems: 'center'},
-    scrollContainer: {padding: 5, flex: 1, backgroundColor: colors?.primary || '#FFDFAD'},
+    scrollContainer: {
+        padding: 5, flex: 1, backgroundColor: colors?.primary || '#FFDFAD', overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
+    },
     scrollContent: {
         padding: 5,
         flexGrow: 1,
