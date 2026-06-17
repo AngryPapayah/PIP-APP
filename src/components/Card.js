@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         flex: 1,
 
-        aspectRatio: 1,
+        // aspectRatio: 1,
     },
     lockedCard: {
         opacity: 0.5
