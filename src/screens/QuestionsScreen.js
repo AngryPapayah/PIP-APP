@@ -132,28 +132,22 @@ export default function QuestionsScreen() {
     const currentQuestion = questions[currentIndex];
 
     return (
-
         <SafeAreaView style={styles.container}>
-            <ScrollView>
-
-                <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
-                {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
-                    <MultipleChoice
-                        question={currentQuestion}
-                        onNext={handleNext}
-                        isLastQuestion={currentIndex === questions.length - 1}
-                    />
-                ) : (
-                    <SwipeCard
-                        question={currentQuestion}
-                        onNext={handleNext}
-                        isLastQuestion={currentIndex === questions.length - 1}
-                    />
-                )}
-            </ScrollView>
-
+            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
+            {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
+                <MultipleChoice
+                    question={currentQuestion}
+                    onNext={handleNext}
+                    isLastQuestion={currentIndex === questions.length - 1}
+                />
+            ) : (
+                <SwipeCard
+                    question={currentQuestion}
+                    onNext={handleNext}
+                    isLastQuestion={currentIndex === questions.length - 1}
+                />
+            )}
         </SafeAreaView>
-
     );
 }
 

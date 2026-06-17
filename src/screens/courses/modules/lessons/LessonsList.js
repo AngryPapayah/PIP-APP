@@ -42,7 +42,7 @@ export default function LessonsList() {
     }
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"}/>
@@ -59,7 +59,7 @@ export default function LessonsList() {
                     </View>
                 )}
             />
-        </ScrollView>
+        </View>
     );
 }
 

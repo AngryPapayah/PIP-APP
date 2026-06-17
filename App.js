@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -31,7 +31,7 @@ const AppNavigator = () => {
     }
 
     return (
-        <ScrollView style={{flex: 1}}>
+        <View style={{flex: 1}}>
             <Stack.Navigator screenOptions={{headerShown: false}}>
                 {user ? (
                     <>
@@ -49,11 +49,11 @@ const AppNavigator = () => {
             </Stack.Navigator>
 
             {globalLoading && (
-                <ScrollView style={StyleSheet.absoluteFill}>
+                <View style={StyleSheet.absoluteFill}>
                     <LoadingScreen/>
-                </ScrollView>
+                </View>
             )}
-        </ScrollView>
+        </View>
     );
 };
 

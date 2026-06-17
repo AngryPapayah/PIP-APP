@@ -90,53 +90,47 @@ export default function ResultScreen({navigation, route}) {
     return (
 
         <SafeAreaView style={styles.container}>
-            <ScrollView>
-
-                <View style={styles.content}>
-                    <View style={styles.characterContainer}>
-                        <TextBubble text={bubbleText}/>
-                        <Image source={require('../../public/images/pip-body.png')} style={styles.characterImage}/>
-                    </View>
-                    <Text style={styles.scoreText}>{t.ui.score}: {score}%</Text>
-                    <View style={styles.xpBarSection}>
-                        <XPBar currentXP={currentXP} level={level} refreshTrigger={refreshXP}
-                               onLevelUp={handleLevelUp}/>
-                    </View>
+            <View style={styles.content}>
+                <View style={styles.characterContainer}>
+                    <TextBubble text={bubbleText}/>
+                    <Image source={require('../../public/images/pip-body.png')} style={styles.characterImage}/>
                 </View>
-
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={goToHamsterverse}>
-                        <Text style={styles.buttonText}>{t.ui.hamsterverse || "Hamsterverse"}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={goToHome}>
-                        <Text style={styles.buttonText}>{t.ui.home || "Home"}</Text>
-                    </TouchableOpacity>
+                <Text style={styles.scoreText}>{t.ui.score}: {score}%</Text>
+                <View style={styles.xpBarSection}>
+                    <XPBar currentXP={currentXP} level={level} refreshTrigger={refreshXP} onLevelUp={handleLevelUp}/>
                 </View>
+            </View>
 
-                <Modal visible={showRewardModal} transparent={true} animationType="fade"
-                       onRequestClose={closeRewardModal}>
-                    <View style={styles.modalOverlay}>
-                        <View style={[styles.modalContent, {backgroundColor: colors.primary || '#F4E1C1'}]}>
-                            <TouchableOpacity style={styles.closeButton} onPress={closeRewardModal}>
-                                <Text style={styles.closeButtonText}>✕</Text>
-                            </TouchableOpacity>
-                            <View style={styles.rewardContainer}>
-                                <Text style={styles.rewardTitle}>{t.rewards.unlockedTitle}</Text>
-                                {newlyUnlockedReward && (
-                                    <>
-                                        <Image source={newlyUnlockedReward.image} style={styles.rewardImage}
-                                               resizeMode="contain"/>
-                                        <Text style={styles.rewardName}>{newlyUnlockedReward.name}</Text>
-                                        <Text style={styles.rewardDescription}>{newlyUnlockedReward.description}</Text>
-                                    </>
-                                )}
-                                <Text style={styles.rewardFooter}>{t.rewards.footerNote}</Text>
-                            </View>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={goToHamsterverse}>
+                    <Text style={styles.buttonText}>{t.ui.hamsterverse || "Hamsterverse"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={goToHome}>
+                    <Text style={styles.buttonText}>{t.ui.home || "Home"}</Text>
+                </TouchableOpacity>
+            </View>
+
+            <Modal visible={showRewardModal} transparent={true} animationType="fade" onRequestClose={closeRewardModal}>
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, {backgroundColor: colors.primary || '#F4E1C1'}]}>
+                        <TouchableOpacity style={styles.closeButton} onPress={closeRewardModal}>
+                            <Text style={styles.closeButtonText}>✕</Text>
+                        </TouchableOpacity>
+                        <View style={styles.rewardContainer}>
+                            <Text style={styles.rewardTitle}>{t.rewards.unlockedTitle}</Text>
+                            {newlyUnlockedReward && (
+                                <>
+                                    <Image source={newlyUnlockedReward.image} style={styles.rewardImage}
+                                           resizeMode="contain"/>
+                                    <Text style={styles.rewardName}>{newlyUnlockedReward.name}</Text>
+                                    <Text style={styles.rewardDescription}>{newlyUnlockedReward.description}</Text>
+                                </>
+                            )}
+                            <Text style={styles.rewardFooter}>{t.rewards.footerNote}</Text>
                         </View>
                     </View>
-                </Modal>
-            </ScrollView>
-
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
