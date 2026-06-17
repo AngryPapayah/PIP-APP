@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert, DevSettings } from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View, TouchableOpacity, Alert, DevSettings} from 'react-native';
 import * as Updates from 'expo-updates';
-import { colors } from '../styles/GlobalStyles';
-import { useLanguage } from '../contexts/LanguageContext';
-import { PipMessages } from '../constants/PipMessages';
+import {colors} from '../styles/GlobalStyles';
+import {useLanguage} from '../contexts/LanguageContext';
+import {PipMessages} from '../constants/PipMessages';
 
-export default function SettingsScreen({ onClose }) {
-    const { language, setLanguage, t } = useLanguage();
+export default function SettingsScreen({onClose}) {
+    const {language, setLanguage, t} = useLanguage();
     const [tempLanguage, setTempLanguage] = useState(language);
 
     const languages = [
-        { code: 'en', label: 'English' },
-        { code: 'nl', label: 'Nederlands' },
-        { code: 'hamster', label: 'Hamster' }
+        {code: 'en', label: 'English'},
+        {code: 'hamster', label: 'Hamster'}
     ];
 
     const handleApplyLanguage = async () => {
