@@ -7,7 +7,6 @@ import {Image, TouchableOpacity, Text} from "react-native";
 import HomeStackScreen from "./HomeStackNavigator";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
-import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -59,7 +58,7 @@ export default function BottomTabNavigator() {
                         accessibilityLabel="Open menu"
                         accessibilityHint="Opens the side navigation drawer"
                     >
-                        <Ionicons name="menu" size={30} color={colors.textCard}/>
+                        <Text style={{fontSize: 30, color: colors.textCard}}>☰</Text>
                     </TouchableOpacity>
                 ),
             }}>

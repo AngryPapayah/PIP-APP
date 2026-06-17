@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import XPBar from '../components/XPBar';
 import { fetchAPI } from "../services/Fetch";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { CopilotStep, useCopilot, walkthroughable } from "react-native-copilot";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import SettingsScreen from './SettingsScreen';
@@ -120,7 +119,7 @@ export default function ProfileScreen() {
 
             {streak && (
                 <View style={[styles.card, styles.streakContainer]}>
-                    <Icon name="fire" size={24} color="#FFA500" style={styles.streakIcon}/>
+                    <Text style={styles.streakIcon}>🔥</Text>
                     <View>
                         <Text style={styles.streakText}>
                             Streak: {streak?.current_streak || 0} {(streak?.current_streak === 1) ? 'day' : 'days'}
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
     xpCard: { width: '100%', marginBottom: 20 },
     card: { width: '100%', backgroundColor: '#fff', borderRadius: 15, padding: 20, marginBottom: 25, borderWidth: 2, borderColor: colors?.accent || '#784F4E' },
     streakContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors?.secondary || '#FFFFFF' },
-    streakIcon: { marginRight: 10 },
+    streakIcon: { marginRight: 10, fontSize: 24 },
     streakText: { color: colors?.textMain || '#141414', fontSize: 18, fontWeight: 'bold' },
     highestStreakText: { color: colors?.textMain || '#141414', fontSize: 12 },
     row: { marginVertical: 10 },

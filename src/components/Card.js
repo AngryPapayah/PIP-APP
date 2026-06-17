@@ -1,18 +1,25 @@
 import {StyleSheet, Pressable, View, Text} from "react-native";
 import {CustomButton} from "./CustomButton";
-import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../styles/GlobalStyles";
 
 export const Card = ({iconName, lessonTitle, description, buttonText, estimated_time, onPress}) => {
 
     const isLocked = iconName === 'lock-closed';
     const isFinished = iconName === 'checkmark-circle';
+    const isEye = iconName === 'eye';
+
+    const renderIcon = () => {
+        if (isEye) {
+            return <Text style={{fontSize: 100}}>👁</Text>;
+        }
+        return <Text style={{fontSize: 100}}>{isFinished ? '✅' : '🔒'}</Text>;
+    };
 
     return (
         <Pressable onPress={onPress}
                    style={[styles.container, isLocked && styles.lockedCard, isFinished]}>
             <Text style={styles.titleText}>{lessonTitle}</Text>
-            <Ionicons name={iconName} size={100} color={isFinished ? '#464712' : '#000'}></Ionicons>
+            {renderIcon()}
             <Text>{estimated_time}</Text>
             <Text style={styles.descriptionText} numberOfLines={5}>{description}</Text>
             <CustomButton variant="primary" size="md" disabled={isLocked} onPress={onPress}
@@ -63,4 +70,3 @@ const styles = StyleSheet.create({
         padding: 10,
     }
 })
-
