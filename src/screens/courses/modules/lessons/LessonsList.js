@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from "../../../../styles/GlobalStyles";
+import React, {useEffect, useState} from "react";
+import {FlatList, StyleSheet, Text, TouchableOpacity, View, Alert} from "react-native";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import {Ionicons} from '@expo/vector-icons';
+import {colors} from "../../../../styles/GlobalStyles";
 import LessonsListItem from "./LessonsListItem";
-import { fetchAPI } from "../../../../services/Fetch";
-import { useLoading } from "../../../../contexts/LoadingContext";
-import { useLanguage } from "../../../../contexts/LanguageContext";
+import {fetchAPI} from "../../../../services/Fetch";
+import {useLoading} from "../../../../contexts/LoadingContext";
+import {useLanguage} from "../../../../contexts/LanguageContext";
 
 export default function LessonsList() {
     const route = useRoute();
     const navigation = useNavigation();
-    const { moduleId, moduleTitle } = route.params;
-    const { setLoading } = useLoading();
-    const { t } = useLanguage();
+    const {moduleId, moduleTitle} = route.params;
+    const {setLoading} = useLoading();
+    const {t} = useLanguage();
 
     const [lessons, setLessons] = useState([]);
 
@@ -42,10 +42,10 @@ export default function LessonsList() {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"} />
+                    <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"}/>
                 </TouchableOpacity>
                 <Text style={styles.text}>{t.ui.lessonsFrom} {moduleTitle}</Text>
             </View>
@@ -53,13 +53,13 @@ export default function LessonsList() {
                 data={lessons}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContainer}
-                renderItem={({ item }) => (
+                renderItem={({item}) => (
                     <View style={styles.itemWrapper}>
-                        <LessonsListItem lesson={item} moduleId={moduleId} />
+                        <LessonsListItem lesson={item} moduleId={moduleId}/>
                     </View>
                 )}
             />
-        </View>
+        </ScrollView>
     );
 }
 

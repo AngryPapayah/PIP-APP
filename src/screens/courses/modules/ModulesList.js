@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View, Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { colors } from "../../../styles/GlobalStyles";
-import { fetchAPI } from "../../../services/Fetch";
+import React, {useEffect, useState} from "react";
+import {FlatList, StyleSheet, Text, View, Alert, ScrollView} from "react-native";
+import {useNavigation} from "@react-navigation/native";
+import {colors} from "../../../styles/GlobalStyles";
+import {fetchAPI} from "../../../services/Fetch";
 import ModulesListItem from "./ModulesListItem";
-import { useFilter } from "../../../contexts/FilterContext";
-import { useLoading } from "../../../contexts/LoadingContext";
-import { useLanguage } from "../../../contexts/LanguageContext";
+import {useFilter} from "../../../contexts/FilterContext";
+import {useLoading} from "../../../contexts/LoadingContext";
+import {useLanguage} from "../../../contexts/LanguageContext";
 
 export default function ModulesList() {
     const navigation = useNavigation();
     const [modules, setModules] = useState([]);
     const [filteredModules, setFilteredModules] = useState([]);
 
-    const { setLoading } = useLoading();
-    const { selectedTitle } = useFilter();
-    const { t } = useLanguage();
+    const {setLoading} = useLoading();
+    const {selectedTitle} = useFilter();
+    const {t} = useLanguage();
 
     useEffect(() => {
         getModules();
@@ -51,7 +51,7 @@ export default function ModulesList() {
     }, [selectedTitle, modules]);
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             {filteredModules.length === 0 ? (
                 <View>
                     <Text>{t.errors.noModules}</Text>
@@ -61,14 +61,14 @@ export default function ModulesList() {
                     data={filteredModules}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContainer}
-                    renderItem={({ item }) => (
+                    renderItem={({item}) => (
                         <View style={styles.itemWrapper}>
-                            <ModulesListItem module={item} />
+                            <ModulesListItem module={item}/>
                         </View>
                     )}
                 />
             )}
-        </View>
+        </ScrollView>
     );
 }
 

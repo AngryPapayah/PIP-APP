@@ -1,22 +1,22 @@
 import MultipleChoice from "../components/MultipleChoice";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, Alert, View } from "react-native";
-import { colors } from "../styles/GlobalStyles";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import {useEffect, useState} from "react";
+import {SafeAreaView, StyleSheet, Text, Alert, View} from "react-native";
+import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
-import { fetchAPI } from "../services/Fetch";
+import {fetchAPI} from "../services/Fetch";
 import ProgressBar from "../components/ProgressBar";
-import { useAuth } from "../contexts/AuthContext";
-import { useLoading } from "../contexts/LoadingContext";
-import { useLanguage } from "../contexts/LanguageContext";
+import {useAuth} from "../contexts/AuthContext";
+import {useLoading} from "../contexts/LoadingContext";
+import {useLanguage} from "../contexts/LanguageContext";
 
 export default function QuestionsScreen() {
     const route = useRoute();
     const navigation = useNavigation();
-    const { user, refreshUser } = useAuth();
-    const { setLoading } = useLoading();
-    const { t } = useLanguage();
-    const { moduleId, lessonId } = route.params;
+    const {user, refreshUser} = useAuth();
+    const {setLoading} = useLoading();
+    const {t} = useLanguage();
+    const {moduleId, lessonId} = route.params;
 
     const [questions, setQuestions] = useState([]);
     const [attemptId, setAttemptId] = useState(null);
@@ -32,7 +32,7 @@ export default function QuestionsScreen() {
     async function getQuestions() {
         setLoading(true);
         try {
-            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', { userId });
+            const startData = await fetchAPI(`progress/lessons/${lessonId}/start`, 'POST', {userId});
             if (startData && startData.error) {
                 Alert.alert(t.ui.error, startData.error);
                 return;
@@ -60,7 +60,7 @@ export default function QuestionsScreen() {
                             extractedAnswers = rawAnswers;
                         }
 
-                        return { ...question, answers: extractedAnswers };
+                        return {...question, answers: extractedAnswers};
                     })
                 );
                 setQuestions(fullQuestions.sort(() => Math.random() - 0.5));
@@ -97,7 +97,7 @@ export default function QuestionsScreen() {
             const isLast = currentIndex >= questions.length - 1;
 
             if (isLast) {
-                const completeRes = await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId });
+                const completeRes = await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', {userId});
                 const finalScore = completeRes?.score || currentScore;
 
                 await fetchAPI('progress/xp', 'POST', {
@@ -109,14 +109,14 @@ export default function QuestionsScreen() {
 
                 await refreshUser();
 
-                navigation.navigate("ResultScreen", { attemptId, lessonId, score: finalScore });
+                navigation.navigate("ResultScreen", {attemptId, lessonId, score: finalScore});
             } else {
                 setCurrentIndex(prev => prev + 1);
             }
         } catch (error) {
             if (currentIndex >= questions.length - 1) {
                 await refreshUser();
-                navigation.navigate("ResultScreen", { score: localScore });
+                navigation.navigate("ResultScreen", {score: localScore});
             } else {
                 setCurrentIndex(prev => prev + 1);
             }
@@ -132,22 +132,26 @@ export default function QuestionsScreen() {
     const currentQuestion = questions[currentIndex];
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length} />
-            {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
-                <MultipleChoice
-                    question={currentQuestion}
-                    onNext={handleNext}
-                    isLastQuestion={currentIndex === questions.length - 1}
-                />
-            ) : (
-                <SwipeCard
-                    question={currentQuestion}
-                    onNext={handleNext}
-                    isLastQuestion={currentIndex === questions.length - 1}
-                />
-            )}
-        </SafeAreaView>
+        <ScrollView>
+
+            <SafeAreaView style={styles.container}>
+                <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
+                {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
+                    <MultipleChoice
+                        question={currentQuestion}
+                        onNext={handleNext}
+                        isLastQuestion={currentIndex === questions.length - 1}
+                    />
+                ) : (
+                    <SwipeCard
+                        question={currentQuestion}
+                        onNext={handleNext}
+                        isLastQuestion={currentIndex === questions.length - 1}
+                    />
+                )}
+            </SafeAreaView>
+        </ScrollView>
+
     );
 }
 
