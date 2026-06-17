@@ -51,27 +51,30 @@ export default function ModulesList() {
     }, [selectedTitle, modules]);
 
     return (
-        <FlatList
-            style={styles.container}
-            data={filteredModules}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.listContainer}
-            renderItem={({item}) => (
-                <View style={styles.itemWrapper}>
-                    <ModulesListItem module={item}/>
-                </View>
-            )}
-            ListEmptyComponent={
+        <ScrollView style={styles.container}>
+            {filteredModules.length === 0 ? (
                 <View>
                     <Text>{t.errors.noModules}</Text>
                 </View>
-            }
-        />
+            ) : (
+                <FlatList
+                    data={filteredModules}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                    renderItem={({item}) => (
+                        <View style={styles.itemWrapper}>
+                            <ModulesListItem module={item}/>
+                        </View>
+                    )}
+                />
+            )}
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        padding: 10,
         flex: 1,
         backgroundColor: colors?.primary || '#F4E1C1',
     },
