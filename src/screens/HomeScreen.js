@@ -7,7 +7,6 @@ import {CopilotStep, useCopilot, walkthroughable} from "react-native-copilot";
 import {useNavigation, useFocusEffect} from "@react-navigation/native";
 import {useAuth} from "../contexts/AuthContext";
 import {useLanguage} from '../contexts/LanguageContext';
-import safeAreaView from "react-native-web/src/exports/SafeAreaView";
 
 const CopilotView = walkthroughable(({style, children, ...props}) => (
     <View style={style} {...props}>{children}</View>
@@ -50,8 +49,8 @@ export default function HomeScreen() {
     }, [navigation, copilotEvents]);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <ScrollView style={styles.container} onLayout={() => setIsLayoutReady(true)}>
+        <SafeAreaView style={styles.safeAreaView}>
+            <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
                 <CopilotStep name="WelcomeText" order={1} text={t.onboarding.homeWelcomeText}>
                     <CopilotView>
                         <Text style={styles.text}>{t.ui.yourModules}</Text>
@@ -74,11 +73,10 @@ const styles = StyleSheet.create({
         backgroundColor: colors?.primary || '#F4E1C1',
     },
     container: {
-        flexGrow: 1,
         backgroundColor: colors?.primary || '#F4E1C1',
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 50
+        paddingTop: 50,
+        paddingBottom: 50
     },
     text: {
         fontSize: 35,
