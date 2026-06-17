@@ -160,7 +160,8 @@ const styles = StyleSheet.create({
     container: {
         padding: 10,
         flex: 1,
-        backgroundColor: colors?.primary || '#FFDFAD'
+        backgroundColor: colors?.primary || '#FFDFAD',
+        overflow: 'hidden'
     },
     safeAreaView: {
         flex: 1,
