@@ -1,7 +1,7 @@
 import MultipleChoice from "../components/MultipleChoice";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {SafeAreaView, StyleSheet, Text, Alert, View} from "react-native";
+import {SafeAreaView, StyleSheet, Text, Alert, View, ScrollView} from "react-native";
 import {colors} from "../styles/GlobalStyles";
 import SwipeCard from "../components/SwipeCard";
 import {fetchAPI} from "../services/Fetch";
@@ -132,21 +132,26 @@ export default function QuestionsScreen() {
     const currentQuestion = questions[currentIndex];
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
-            {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
-                <MultipleChoice
-                    question={currentQuestion}
-                    onNext={handleNext}
-                    isLastQuestion={currentIndex === questions.length - 1}
-                />
-            ) : (
-                <SwipeCard
-                    question={currentQuestion}
-                    onNext={handleNext}
-                    isLastQuestion={currentIndex === questions.length - 1}
-                />
-            )}
+        <SafeAreaView style={styles.safeAreaView}>
+
+            <ScrollView contentContainerStyle={styles.container} onLayout={() => setIsLayoutReady(true)}>
+
+                <ProgressBar currentStep={currentIndex + 1} totalSteps={questions.length}/>
+                {currentQuestion?.question_type?.toLowerCase() === "multiple_choice" ? (
+                    <MultipleChoice
+                        question={currentQuestion}
+                        onNext={handleNext}
+                        isLastQuestion={currentIndex === questions.length - 1}
+                    />
+                ) : (
+                    <SwipeCard
+                        question={currentQuestion}
+                        onNext={handleNext}
+                        isLastQuestion={currentIndex === questions.length - 1}
+                    />
+                )}
+            </ScrollView>
+
         </SafeAreaView>
     );
 }
@@ -156,5 +161,9 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         backgroundColor: colors?.primary || '#FFDFAD'
-    }
+    },
+    safeAreaView: {
+        flex: 1,
+        backgroundColor: colors?.primary || '#F4E1C1',
+    },
 });
