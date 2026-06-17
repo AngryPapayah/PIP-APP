@@ -13,7 +13,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 export default function QuestionsScreen() {
     const route = useRoute();
     const navigation = useNavigation();
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     const { setLoading } = useLoading();
     const { t } = useLanguage();
     const { moduleId, lessonId } = route.params;
@@ -83,12 +83,14 @@ export default function QuestionsScreen() {
 
         setLoading(true);
         try {
-            const answerSubmissionRes = await fetchAPI(`progress/attempts/${attemptId}/answers`, 'POST', {
+            await fetchAPI(`progress/attempts/${attemptId}/answers`, 'POST', {
                 questionId: currentQuestion.id,
                 answerId: selectedAnswerId
             });
 
+            let currentScore = localScore;
             if (isCorrect) {
+                currentScore = localScore + 10;
                 setLocalScore(prevScore => prevScore + 10);
             }
 
@@ -96,7 +98,7 @@ export default function QuestionsScreen() {
 
             if (isLast) {
                 const completeRes = await fetchAPI(`progress/attempts/${attemptId}/complete`, 'POST', { userId });
-                const finalScore = completeRes?.score || localScore;
+                const finalScore = completeRes?.score || currentScore;
 
                 await fetchAPI('progress/xp', 'POST', {
                     userId,
@@ -105,12 +107,15 @@ export default function QuestionsScreen() {
                     xpAmount: finalScore
                 });
 
+                await refreshUser();
+
                 navigation.navigate("ResultScreen", { attemptId, lessonId, score: finalScore });
             } else {
                 setCurrentIndex(prev => prev + 1);
             }
         } catch (error) {
             if (currentIndex >= questions.length - 1) {
+                await refreshUser();
                 navigation.navigate("ResultScreen", { score: localScore });
             } else {
                 setCurrentIndex(prev => prev + 1);

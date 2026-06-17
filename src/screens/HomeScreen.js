@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../styles/GlobalStyles';
 import ModulesList from "./courses/modules/ModulesList";
@@ -17,20 +17,25 @@ export default function HomeScreen() {
     const { t } = useLanguage();
     const { start, copilotEvents } = useCopilot();
     const [isLayoutReady, setIsLayoutReady] = useState(false);
+    const hasStartedTour = useRef(false);
 
     useFocusEffect(
         useCallback(() => {
-            refreshUser();
-           }, [refreshUser])
+            if (user?.on_boarding === 1) {
+                refreshUser();
+            }
+        }, [refreshUser, user?.on_boarding])
     );
+
     useEffect(() => {
-        if (isLayoutReady && (user?.on_boarding === 0 || user?.startTour === true)) {
+        if (isLayoutReady && user?.on_boarding === 0 && user?.startTour === true && !hasStartedTour.current) {
+            hasStartedTour.current = true;
             const timer = setTimeout(() => {
                 start();
             }, 600);
             return () => clearTimeout(timer);
         }
-    }, [isLayoutReady, user, start]);
+    }, [isLayoutReady, user?.on_boarding, user?.startTour, start]);
 
     useEffect(() => {
         copilotEvents.on('stop', () => {

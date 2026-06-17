@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { globalStyles, colors } from "../styles/GlobalStyles";
+import { colors } from "../styles/GlobalStyles";
 import { fetchAPI } from "../services/Fetch";
+import { useAuth } from "../contexts/AuthContext";
 import { useLoading } from "../contexts/LoadingContext";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function SignupScreen({ navigation }) {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
@@ -35,11 +37,18 @@ export default function SignupScreen({ navigation }) {
             }
 
             setErrorMessage('');
-            Alert.alert(
-                t.success.registration,
-                t.success.recognised,
-                [{ text: "OK", onPress: () => navigation.navigate('Login') }]
-            );
+
+            const user = result.data?.user;
+            const token = result.data?.token;
+
+            if (user && token) {
+                if (user.on_boarding === 0) {
+                    user.startTour = true;
+                }
+                await login(user, token);
+            } else {
+                navigation.navigate('Login');
+            }
         } catch (error) {
             setErrorMessage(t.errors.distracted);
         } finally {

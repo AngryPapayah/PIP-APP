@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { colors } from '../styles/GlobalStyles';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,7 +16,6 @@ const CopilotView = walkthroughable(({ style, children, ...props }) => (
     <View style={style} {...props}>{children}</View>
 ));
 
-// Checkt of een datum (van de backend) vandaag is
 function isToday(dateString) {
     if (!dateString) return false;
     const d = new Date(dateString);
@@ -27,61 +26,64 @@ function isToday(dateString) {
 }
 
 export default function ProfileScreen() {
-const { logout, user, refreshUser } = useAuth();
-const { t } = useLanguage();
-const [streak, setStreak] = useState(null);
-const [showSettingsModal, setShowSettingsModal] = useState(false);
-const [isLayoutReady, setIsLayoutReady] = useState(false);
-const navigation = useNavigation();
-const route = useRoute();
-const { start, copilotEvents } = useCopilot();
+    const { logout, user, refreshUser } = useAuth();
+    const { t } = useLanguage();
+    const [streak, setStreak] = useState(null);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [isLayoutReady, setIsLayoutReady] = useState(false);
+    const hasStartedTour = useRef(false);
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { start, copilotEvents } = useCopilot();
 
-useEffect(() => {
-    console.log("User object in profile:", user);
-    if (user?.id) {
-        getStreak();
-    }
-}, [user]);
+    useEffect(() => {
+        if (user?.id) {
+            getStreak();
+        }
+    }, [user]);
 
-async function getStreak() {
-    try {
-        const data = await fetchAPI(`users/${user.id}/streak`, 'GET');
-        if (data && !data.error && data.status !== 404) {
-            const streakData = data.data || data;
-            const result = Array.isArray(streakData) ? (streakData[0] || {}) : (streakData || {});
-            const justStartedToday = result.current_streak === 0 && isToday(result.last_active_date);
-            setStreak({
-                ...result,
-                current_streak: justStartedToday ? 1 : (result.current_streak || 0),
-                highest_streak: result.highest_streak || 0,
-            });
-        } else {
+    async function getStreak() {
+        try {
+            const data = await fetchAPI(`users/${user.id}/streak`, 'GET');
+            if (data && !data.error && data.status !== 404) {
+                const streakData = data.data || data;
+                const result = Array.isArray(streakData) ? (streakData[0] || {}) : (streakData || {});
+                const justStartedToday = result.current_streak === 0 && isToday(result.last_active_date);
+                setStreak({
+                    ...result,
+                    current_streak: justStartedToday ? 1 : (result.current_streak || 0),
+                    highest_streak: result.highest_streak || 0,
+                });
+            } else {
+                setStreak({ current_streak: 0, highest_streak: 0 });
+            }
+        } catch (error) {
             setStreak({ current_streak: 0, highest_streak: 0 });
         }
-    } catch (error) {
-        setStreak({ current_streak: 0, highest_streak: 0 });
     }
-}
 
-const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? user?.experience ?? 0;
-const level = Math.floor(xp / 100) + 1;
-const currentXP = xp % 100;
+    const xp = user?.xp ?? user?.XP ?? user?.experience_points ?? user?.experience ?? 0;
+    const level = Math.floor(xp / 100) + 1;
+    const currentXP = xp % 100;
 
     useFocusEffect(
         useCallback(() => {
-            refreshUser();
-        }, [refreshUser])
+            if (user?.on_boarding === 1) {
+                refreshUser();
+            }
+        }, [refreshUser, user?.on_boarding])
     );
 
     useEffect(() => {
         const starting = route?.params?.startTour;
-        if (isLayoutReady && starting) {
+        if (isLayoutReady && starting && user?.on_boarding === 0 && !hasStartedTour.current) {
+            hasStartedTour.current = true;
             const timer = setTimeout(() => {
                 start("ProfileText");
             }, 600);
             return () => clearTimeout(timer);
         }
-    }, [isLayoutReady, route?.params]);
+    }, [isLayoutReady, route?.params, user?.on_boarding, start]);
 
     useEffect(() => {
         copilotEvents.on('stop', () => {
@@ -110,11 +112,11 @@ const currentXP = xp % 100;
                 </CopilotView>
             </CopilotStep>
 
-<CopilotStep name="ProfileXP" order={4} text="Hier zie je je huidige niveau en de verdiende XP.">
-    <CopilotView style={styles.xpCard}>
-        <XPBar currentXP={currentXP} level={level} />
-    </CopilotView>
-</CopilotStep>
+            <CopilotStep name="ProfileXP" order={4} text="Hier zie je je huidige niveau en de verdiende XP.">
+                <CopilotView style={styles.xpCard}>
+                    <XPBar currentXP={currentXP} level={level} />
+                </CopilotView>
+            </CopilotStep>
 
             {streak && (
                 <View style={[styles.card, styles.streakContainer]}>
@@ -161,6 +163,7 @@ const currentXP = xp % 100;
         </ScrollView>
     );
 }
+
 const styles = StyleSheet.create({
     container: { flexGrow: 1, backgroundColor: colors?.primary || '#F4E1C1', padding: 20, alignItems: 'center' },
     title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: colors.textMain || '#000' },
@@ -179,5 +182,5 @@ const styles = StyleSheet.create({
     logoutButton: { backgroundColor: colors?.error || '#FF3B3B', paddingVertical: 14, borderRadius: 25, width: '100%', alignItems: 'center' },
     logoutButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' },
-    modalContent: { width: '90%', maxHeight: '80%' },
+    modalContent: { width: '90%', maxHeight: '80%', backgroundColor: '#FFFFFF', paddingVertical: 25, borderRadius: 20, borderWidth: 2, borderColor: colors?.accent || '#784F4E', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5, elevation: 8 },
 });
