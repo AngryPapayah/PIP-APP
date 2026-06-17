@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {FlatList, StyleSheet, Text, View, Alert} from "react-native";
+import {FlatList, StyleSheet, Text, View, Alert, ScrollView} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import {colors} from "../../../styles/GlobalStyles";
 import {fetchAPI} from "../../../services/Fetch";
@@ -51,7 +51,7 @@ export default function ModulesList() {
     }, [selectedTitle, modules]);
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             {filteredModules.length === 0 ? (
                 <View>
                     <Text>{t.errors.noModules}</Text>
@@ -68,7 +68,7 @@ export default function ModulesList() {
                     )}
                 />
             )}
-        </View>
+        </ScrollView>
     );
 }
 
