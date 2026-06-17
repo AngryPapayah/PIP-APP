@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {FlatList, StyleSheet, Text, TouchableOpacity, View, Alert} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
-import {Ionicons} from '@expo/vector-icons';
 import {colors} from "../../../../styles/GlobalStyles";
 import LessonsListItem from "./LessonsListItem";
 import {fetchAPI} from "../../../../services/Fetch";
@@ -45,7 +44,7 @@ export default function LessonsList() {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={25} color={colors?.textMain || "#000"}/>
+                    <Text style={{fontSize: 25}}>🔙</Text>
                 </TouchableOpacity>
                 <Text style={styles.text}>{t.ui.lessonsFrom} {moduleTitle}</Text>
             </View>
