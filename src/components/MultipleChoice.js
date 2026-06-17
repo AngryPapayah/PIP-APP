@@ -39,7 +39,7 @@ export default function MultipleChoice({question, onNext, isLastQuestion}) {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContainer}>
             {hasAnswered ? (
                 <View style={styles.container}>
                     {question?.explanation && (
@@ -87,8 +87,11 @@ export default function MultipleChoice({question, onNext, isLastQuestion}) {
 }
 
 const styles = StyleSheet.create({
+    scrollView: {
+        flex: 1,
+    },
     container: { padding: 20, backgroundColor: colors?.primary || '#FFDFAD', alignItems: 'center' },
-    scrollContainer: { padding: 5, backgroundColor: colors?.primary || '#FFDFAD', alignItems: 'center', paddingBottom: 50 },
+    scrollContainer: { padding: 5, backgroundColor: colors?.primary || '#FFDFAD', alignItems: 'center', paddingBottom: 50, flexGrow: 1 },
     answersContainer: { width: "100%" },
     imageStyle: { width: 200, height: 200, marginLeft: 15 }
 });

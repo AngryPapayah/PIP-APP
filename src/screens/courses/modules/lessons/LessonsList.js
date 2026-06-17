@@ -50,6 +50,7 @@ export default function LessonsList() {
                 <Text style={styles.text}>{t.ui.lessonsFrom} {moduleTitle}</Text>
             </View>
             <FlatList
+                style={{flex: 1}}
                 data={lessons}
                 keyExtractor={(item) => item.id.toString()}
                 contentContainerStyle={styles.listContainer}
@@ -77,6 +78,7 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         padding: 20,
+        paddingBottom: 50
     },
     itemWrapper: {
         marginBottom: 20
