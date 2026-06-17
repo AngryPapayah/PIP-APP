@@ -6,7 +6,7 @@ gamification element.
 
 [![AngryPapayah](https://img.shields.io/badge/-AngryPapayah-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AngryPapayah)
 [![eline-vanstraten](https://img.shields.io/badge/-eline--vanstraten-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/eline-vanstraten)
-[![Shav0nnee](https://img.shields.io/badge/-Shav0nnee-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Shav0nnee)
+[![Shav0nnee](https://img.shields.io/badge/-Shav0nne-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Shav0nne)
 [![charge85172](https://img.shields.io/badge/-charge85172-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/charge85172)
 [![qixel2003](https://img.shields.io/badge/-qixel2003-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/qixel2003)
 
