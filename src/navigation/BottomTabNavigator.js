@@ -3,11 +3,11 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {colors} from '../styles/GlobalStyles';
 import ProfileScreen from "../screens/ProfileScreen";
 import HamsterverseScreen from "../screens/HamsterverseScreen";
-import {Ionicons} from '@expo/vector-icons';
 import {Image, TouchableOpacity, Text} from "react-native";
 import HomeStackScreen from "./HomeStackNavigator";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
+import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,17 +15,9 @@ export default function BottomTabNavigator() {
 
     const navigation = useNavigation()
 
-    const PlanetIcon = ({color, size}) => (
-        <Ionicons name="planet" color={color} size={size}/>
-    );
-
-    const HomeIcon = ({color, size}) => (
-        <Ionicons name="home" color={color} size={size}/>
-    );
-
-    const ProfileIcon = ({color, size}) => (
-        <Ionicons name="person" color={color} size={size}/>
-    );
+    const HamsterverseIcon = () => <Text>🐹</Text>;
+    const HomeIcon = () => <Text>🏠︎</Text>;
+    const ProfileIcon = () => <Text>👤</Text>;
 
     return (
         <Tab.Navigator
@@ -76,7 +68,7 @@ export default function BottomTabNavigator() {
                 name="Hamsterverse"
                 component={HamsterverseScreen}
                 options={{
-                    tabBarIcon: PlanetIcon,
+                    tabBarIcon: HamsterverseIcon,
                     tabBarAccessibilityLabel: "Hamsterverse tab",
                 }}
             />
