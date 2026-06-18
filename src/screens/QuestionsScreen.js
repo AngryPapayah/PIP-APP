@@ -161,9 +161,13 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         backgroundColor: colors?.primary || '#FFDFAD',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        maxHeight: '100%',
     },
     safeAreaView: {
+        height: '100%',
+        maxHeight: '100vh',
+        justifyContent: 'flex-start',
         flex: 1,
         backgroundColor: colors?.primary || '#F4E1C1',
     },
