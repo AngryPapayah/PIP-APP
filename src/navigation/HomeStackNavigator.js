@@ -4,8 +4,9 @@ import HomeScreen from "../screens/HomeScreen";
 import LessonsList from "../screens/courses/modules/lessons/LessonsList";
 import QuestionsScreen from "../screens/QuestionsScreen";
 import ResultScreen from "../screens/ResultScreen";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
 
-const HomeStack = createStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
 export default function HomeStackScreen() {
     return (
