@@ -19,7 +19,7 @@ export const CustomButton = ({variant, size, onPress, children, disabled, style}
             <Text style={[
                 styles.buttonText,
                 variant === "questionButton" && {color: '#000'},
-                isRightAnswer && {color: '#0700db'},
+                isRightAnswer && {color: '#1d1a84'},
                 isWrongAnswer && {color: '#000f01'}
             ]}>{children}</Text>
 
